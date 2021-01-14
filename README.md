@@ -26,7 +26,7 @@ Configuration:
 
 This plugin will work right out of the box - almost...
 
-For now, you're going to have get the "Above The Fold" Critical Path CSS, and insert the generated string into the code in file, OAP_plugin.php.
+For now, you're going to have get hold of the "Above The Fold" Critical Path CSS, and insert the generated string into the code in file, OAP_plugin.php.
 You can find the "Above The Fold" Critical Path CSS-string by using Jonas Sebastian Ohlsson's generator at: 
 
 https://jonassebastianohlsson.com/criticalpathcssgenerator/
