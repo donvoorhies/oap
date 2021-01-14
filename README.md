@@ -9,7 +9,7 @@ The following funcions this plugin quietly performs are (for now, as more functi
 - Removing versions + params on URI's
 - Sharpen resized image files
 - Deferring/async js-files
-- Embedding "Above The Fold" Critical Path CSS,  defering CSS-files () and moving js from head to to footer
+- Embedding "Above The Fold" Critical Path CSS,  defering CSS-files () and moving js from head to the footer
 - Minifying all HTML-used, by stripping line-breaks and unnecessary white-spaces 
 
 Installation:
@@ -20,7 +20,9 @@ You can install this plugin via the WordPress admin panel.
 2. In your WordPress admin panel, navigate to Plugins->Add New
 3. Click Upload Plugin
 4. Upload the zip file that you downloaded.
-5. Configuration
+5. Activate from from the admin-panel
+
+Configuration:
 
 This plugin will work right out of the box - almost...
 
