@@ -22,9 +22,11 @@ You can install this plugin via the WordPress admin panel.
 5. Configuration
 
 This plugin will work right out of the box - almost...
-For now, you're going to have get the "Above The Fold" Critical Path CSS, and insert the generated string into the code in file.
+For now, you're going to have get the "Above The Fold" Critical Path CSS, and insert the generated string into the code in file, OAP_plugin.php.
 You can find the "Above The Fold" Critical Path CSS-string by using Jonas Sebastian Ohlsson's generator at https://jonassebastianohlsson.com/criticalpathcssgenerator/
-Follow the instructions here, and copy and paste the generated string into the file between the marked "style"-tags (look for these, along with the identifiying comment);
+Follow the instructions here, and copy and paste the generated string into the file (OAP_plugin.php; line 158 - or thereabouts) between the marked "style"-tags (look for these, along with the identifiying comment:
+"/* INSERT GENERATED "ABOVE THE FOLD" CRITICAL PATH CSS-STRING HERE - EITHER UNDER THIS LINE OR BY REPLACING THIS LINE WITH THE GENERATED STRING...! */
+");
 you can use your webhost's editor to perform this operation. 
 
 Planned/"Wish-list":
