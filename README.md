@@ -27,18 +27,18 @@ You can find the "Above The Fold" Critical Path CSS-string by using Jonas Sebast
 Follow the instructions here, and copy and paste the generated string into the file between the marked "style"-tags (look for these, along with the identifiying comment);
 you can use your webhost's editor to perform this operation. 
 
-Planned/"Wish-list"
+Planned/"Wish-list":
 Future versions of this plugin might have implemented provisions to ease this process by inserting the generated "Above The Fold" Critical Path CSS-string via the admin-panel.
 
-Credits
+Credits:
 This Wordpress-plugin is compiled and effectuated by various pieces of code that herald fom various sources/authors.
 These various sources are credited within this plugin's source-code, and must NOT be removed. 
 This plugin's collecton of code used herein is collected, "compiled" and assembled by this author.
 
 
-Changelog
+Changelog:
 1.0.0ß: January 7th, 2021
 "Don's Optimizaion Anthology Plugin (OAP)" generated and initialized
 
-License
+License:
 Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (https://creativecommons.org/licenses/by-nc-sa/4.0/)
