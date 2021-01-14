@@ -1,5 +1,6 @@
 # OAP
 "Don's Optimization Anthology Plugin" (abbrev.: OAP)
+
 An "anthology" of (IMO) some snazzy Wordpress-functions that I've across over time, which I use to optimize my Wordpress-installations.
 
 The following funcions this plugin quietly performs are (for now, as more functions might be added):
