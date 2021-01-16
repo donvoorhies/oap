@@ -182,7 +182,7 @@ add_action( 'wp_enqueue_scripts', 'remove_head_scripts' );
 
 /* Adds the interesting instant.page script*/
 function faster_page_js() {
-    echo '<script src="//instant.page/5.1.0" type="module" integrity="sha384-by67kQnR+pyfy8yWP4kPO12fHKRLHZPfEsiSXR8u2IKcTdxD805MGUXBzVPnkLHw"></script>';
+    echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/instant.page/5.1.0/instantpage.min.js" integrity="sha512-1+qUtKoh9XZW7j+6LhRMAyOrgSQKenQ4mluTR+cvxXjP1Z54RxZuzstR/H9kgPXQsVB8IW7DMDFUJpzLjvhGSQ==" crossorigin="anonymous"></script>';
 }
 // Add hook for front-end <head></head>
 add_action( 'wp_footer', 'faster_page_js', );
