@@ -179,6 +179,17 @@ add_action( 'wp_enqueue_scripts', 'remove_head_scripts' );
 /*https://speedrak.com/blog/how-to-move-javascripts-to-the-footer-in-wordpress/*/
 
 
+
+/* Adds the interesting instant.page script*/
+function faster_page_js() {
+    echo '<script src="//instant.page/5.1.0" type="module" integrity="sha384-by67kQnR+pyfy8yWP4kPO12fHKRLHZPfEsiSXR8u2IKcTdxD805MGUXBzVPnkLHw"></script>';
+}
+// Add hook for front-end <head></head>
+add_action( 'wp_footer', 'faster_page_js', );
+/* Read more here: https://instant.page/ */
+
+
+
 /* Minify Code on the fly */
 class FLHM_HTML_Compression
 {
