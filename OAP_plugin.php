@@ -3,7 +3,7 @@
  * Plugin Name: Don's Optimization Anthology Plugin
  * Plugin URI: https://don.voorhies.dk/
  * Description: An "anthology" of (IMO) some snazzy functions that I've across over time and which I usually hardcode into 'functions.php' to optimize my Wordpress-installs (Including: Checking if Server-side compression is switched on, linking common jQuery-libs to a CDN, removing versions + params on URI's, sharpen resized image files, deferring/async js, defering CSS-files and moving js from head to to footer)
- * Version: 1.0.0ß
+ * Version: 1.0.1ß
  * Author:  Various Contributors | Compiled and assembled by Don W.Voorhies (See referenced URL for specific credits)...
  * Author URI: https://don.voorhies.dk/
  * License: GPLv2 or later
