@@ -48,7 +48,7 @@ This plugin's collecton of code used herein is collected, "compiled" and assembl
 
 
 Changelog:
-1.0.1ß: January 7th, 2021
+1.0.1ß: January 16th, 2021
 Added code to inject the "faster.page"-script URI (See for further details: https://faster.page)
 
 1.0.0ß: January 7th, 2021
