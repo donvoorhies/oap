@@ -1,19 +1,19 @@
 <?php
 /**
  * Plugin Name: Don's Optimization Anthology Plugin
- * Plugin URI: https://github.com/donvoorhies/oap/
+ * Plugin URI: https://github.com/donvoorhies/oap
  * Description: An "anthology" of (IMO) some snazzy functions that I've across over time and which I usually hardcode into 'functions.php' to optimize my Wordpress-installs (Including: Checking if Server-side compression is switched on, linking common jQuery-libs to a CDN, removing versions + params on URI's, sharpen resized image files, deferring/async js, defering CSS-files and moving js from head to to footer)
- * Version: 1.0.1ß
+ * Version: 1.0.2ß
  * Author:  Various Contributors | Compiled and assembled by Don W.Voorhies (See referenced URL for specific credits)...
- * Author URI: https://donvoorhies.github.io/oap/
+ * Author URI: https://donvoorhies.github.io/oap/.dk
  * License: GPLv2 or later
  */
  
 
-/* Enable GZIP output compression */
+/* Check for/Enable GZIP output compression (if possible) */
 if(extension_loaded("zlib") && (ini_get("output_handler") != "ob_gzhandler"))
 add_action('wp', create_function('', '@ob_end_clean();@ini_set("zlib.output_compression", 1);'));
-/*https://wordpress.stackexchange.com/questions/1567/best-collection-of-code-for-your-functions-php-file?page=1*/
+/* https://wordpress.stackexchange.com/questions/1567/best-collection-of-code-for-your-functions-php-file?page=1 */
 
 
 
@@ -39,7 +39,7 @@ remove_action( 'wp_head', 'index_rel_link' );
 remove_action( 'wp_head', 'adjacent_posts_rel_link' );         // for WordPress < 3.0
 remove_action( 'wp_head', 'adjacent_posts_rel_link_wp_head' ); // for WordPress >= 3.0
 }
-/*https://wordpress.stackexchange.com/questions/1567/best-collection-of-code-for-your-functions-php-file?page=1*/
+/* https://wordpress.stackexchange.com/questions/1567/best-collection-of-code-for-your-functions-php-file?page=1 */
 
 
 
@@ -56,28 +56,50 @@ $wp_widget_factory->widgets['WP_Widget_Recent_Comments'],
 
 
 
-/* Remove internal jQuery-links - and then link to the CDN-libraries, instead. If jQuery Migrate is needed - remove the commenting on the relevant line */
+/* Remove internal jQuery-links - and then link to the CDN-libraries, instead. 
+If jQuery Migrate is needed - remove the commenting on the relevant line (See related comments below) 
+Otherwise add/queue-up your external scripts here!
+*/
 function replace_core_jquery_version(){
 if	(!is_admin()){
-wp_deregister_script('jquery');
-wp_register_script(	'jquery',"https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js",array(),'3.5.1',true);
-wp_deregister_script('touchSwipe');
-wp_register_script(	'touchSwipe',"https://cdnjs.cloudflare.com/ajax/libs/jquery.touchswipe/1.6.19/jquery.touchSwipe.min.js",array(),'1.6.19',true);
-wp_deregister_script('throttle-debounce');
-wp_register_script('throttle-debounce',"https://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js",array(),'3.3.0',true); 
+/* Currently my Wordpress-installation isn't using jQuery at ALL(!!!), therefore it's for the time being unregistered and commented out - use your DEV-tool to find out what you need to add and/or comment/uncomment */	
+wp_deregister_script('jquery-core');
+//wp_register_script('jquery-core',"https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js",array(),'3.5.1',true);
+//wp_script_add_data('jquery-core', array( 'integrity', 'crossorigin' ) , array( 'sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==', 'anonymous' ) );
 
-wp_deregister_script('jquery-migrate');
-/* wp_register_script('jquery-migrate',"https://cdnjs.cloudflare.com/ajax/libs/jquery-migrate/3.3.0/jquery-migrate.min.js",array(),'3.3.0',true);*/ 
+
+/*In general, jQuery-Migrate is no longer included/necessary from Wordpress v5.5; however, if you need to use jQuery-Migrate, then remove the commenting below:*( 
+
+/*1. if you're using an old theme and or plugin bundled with and using jQuery-Migrate, remove the commenting on the three following lines*/
+//wp_deregister_script('jquery-migrate');
+//wp_register_script('jquery-migrate',"https://cdnjs.cloudflare.com/ajax/libs/jquery-migrate/3.3.2/jquery-migrate.min.js",array(),'3.3.2',true);
+//wp_script_add_data( 'jquery-migrate', array( 'integrity', 'crossorigin' ) , array( 'sha512-3fMsI1vtU2e/tVxZORSEeuMhXnT9By80xlmXlsOku7hNwZSHJjwcOBpmy+uu+fyWwGCLkMvdVbHkeoXdAzBv+w==', 'anonymous' ) );
+
+
+/*2. if you need to use jQuery-Migrate, the remove the commenting on the next two following lines */
+//wp_enqueue_script('jquery-migrate',"https://cdnjs.cloudflare.com/ajax/libs/jquery-migrate/3.3.2/jquery-migrate.min.js",array(),'3.3.2',true);
+//wp_script_add_data( 'jquery-migrate', array( 'integrity', 'crossorigin' ) , array( 'sha512-3fMsI1vtU2e/tVxZORSEeuMhXnT9By80xlmXlsOku7hNwZSHJjwcOBpmy+uu+fyWwGCLkMvdVbHkeoXdAzBv+w==', 'anonymous' ) );
+
+
+wp_enqueue_script('instantpage',"https://cdnjs.cloudflare.com/ajax/libs/instant.page/5.1.0/instantpage.min.js",array(),'5.1.0',true);
+wp_script_add_data( 'instantpage', array( 'integrity', 'crossorigin' ) , array( 'sha512-1+qUtKoh9XZW7j+6LhRMAyOrgSQKenQ4mluTR+cvxXjP1Z54RxZuzstR/H9kgPXQsVB8IW7DMDFUJpzLjvhGSQ==', 'anonymous' ) );
+
 }
 }
 add_action(	'wp_enqueue_scripts','replace_core_jquery_version');
 /* https://wordpress.stackexchange.com/questions/257317/update-jquery-version */
+/* https://www.paulund.co.uk/dequeue-styles-and-scripts-in-wordpress */
+/* The fascinating Instant.Page script is by Alexandre Dieulot (https://instant.page/) */
+/* SRI-string adding by: https://stackoverflow.com/questions/44827134/wordpress-script-with-integrity-and-crossorigin (See:cherryaustin) * /
+
+
 
 
 
 /*Async/Defer Javascript*/
 function add_defer_attribute($tag, $handle) {
-$scripts_to_defer = array('jquery-migrate','touchSwipe');
+/* Add your active scripts by their handle in the following array */
+$scripts_to_defer = array(/*'jquery-core',*/'instantpage');
 foreach($scripts_to_defer as $defer_script) {
 if ($defer_script === $handle) {
 return str_replace(' src', ' defer="defer" src', $tag);
@@ -86,7 +108,7 @@ return str_replace(' src', ' defer="defer" src', $tag);
 return $tag;
 }
 add_filter('script_loader_tag','add_defer_attribute',10,2);
-/*https://matthewhorne.me/defer-async-wordpress-scripts/*/
+/* https://matthewhorne.me/defer-async-wordpress-scripts/ */
 
 
 
@@ -135,8 +157,8 @@ return $resized_file;
 return $resized_file;
 }   
 add_filter('image_make_intermediate_size','ajx_sharpen_resized_files',820);
-/*https://wordpress.stackexchange.com/questions/1567/best-collection-of-code-for-your-functions-php-file*/
-/*https://www.keycdn.com/support/optimus/optimize-jpeg-quality-in-wordpress*/
+/* https://wordpress.stackexchange.com/questions/1567/best-collection-of-code-for-your-functions-php-file */
+/* https://www.keycdn.com/support/optimus/optimize-jpeg-quality-in-wordpress */
 
 
 
@@ -176,17 +198,7 @@ add_action('wp_footer', 'wp_print_head_scripts', 5);
 add_action( 'wp_enqueue_scripts', 'remove_head_scripts' );
 
 /* END Custom Scripting to Move JavaScript */
-/*https://speedrak.com/blog/how-to-move-javascripts-to-the-footer-in-wordpress/*/
-
-
-
-/* Adds the interesting instant.page script*/
-function faster_page_js() {
-    echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/instant.page/5.1.0/instantpage.min.js" integrity="sha512-1+qUtKoh9XZW7j+6LhRMAyOrgSQKenQ4mluTR+cvxXjP1Z54RxZuzstR/H9kgPXQsVB8IW7DMDFUJpzLjvhGSQ==" crossorigin="anonymous"></script>';
-}
-// Add hook for front-end <head></head>
-add_action( 'wp_footer', 'faster_page_js', );
-/* Read more here: https://instant.page/ */
+/* https://speedrak.com/blog/how-to-move-javascripts-to-the-footer-in-wordpress/ */
 
 
 
@@ -312,4 +324,4 @@ function flhm_wp_html_compression_start()
 ob_start('flhm_wp_html_compression_finish');
 }
 add_action('get_header', 'flhm_wp_html_compression_start');
-/* https://zuziko.com/tutorials/how-to-minify-html-in-wordpress-without-a-plugin/ by David Green*/
+/* https://zuziko.com/tutorials/how-to-minify-html-in-wordpress-without-a-plugin/ by David Green (Note: EFFIN' BRILLIANT!!!) */
