@@ -16,9 +16,9 @@ Installation:
 
 You can install this plugin via the WordPress admin panel.
 
-1. Download the latest zip of this repo.
-2. In your WordPress admin panel, navigate to Plugins->Add New
-3. Click Upload Plugin
+1. Download the latest zip of this repo (the latest version is always the (only) one which is available).
+2. In your WordPress admin panel, navigate to Plugins->"Add New"
+3. Click "Upload Plugin"
 4. Upload the zip file that you downloaded.
 5. Activate from from the admin-panel
 
@@ -48,6 +48,13 @@ This plugin's collecton of code used herein is collected, "compiled" and assembl
 
 
 Changelog:
+1.0.2ß: January 17th, 2021
+1. Hunted down and removed/fixed some optimization bugs and minor bottle-necks
+2. Added comments referencing were the a newly-added code was found/heralds from
+3. Cleaned up/tweaked a little bit/commented on Matthew Horne's async-/defer-script
+4. Commented out strings of code which either isn't used currently (due the used theme/plugins) - or not necessary at all
+5. Added cherryaustin's code-solution in adding SRI-strings and parameters to URI's, due to safety-concerns and to prevent potential safety issues
+6. Changed the code to inject the "instant.page"-script URI (For further details: https://instant.page) by using Wordpress "wp_register_script"- and "wp_enqueue_script"-functions, instead.
 
 1.0.1ß: January 16th, 2021
 Added code to inject the "instant.page"-script URI (For further details: https://instant.page)
