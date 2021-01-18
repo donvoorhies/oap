@@ -3,17 +3,34 @@
  * Plugin Name: Don's Optimization Anthology Plugin
  * Plugin URI: https://github.com/donvoorhies/oap
  * Description: An "anthology" of (IMO) some snazzy functions that I've across over time and which I usually hardcode into 'functions.php' to optimize my Wordpress-installs (Including: Checking if Server-side compression is switched on, linking common jQuery-libs to a CDN, removing versions + params on URI's, sharpen resized image files, deferring/async js, defering CSS-files and moving js from head to to footer)
- * Version: 1.0.2ß
+ * Version: 1.0.3ß
  * Author:  Various Contributors | Compiled and assembled by Don W.Voorhies (See referenced URL for specific credits)...
  * Author URI: https://donvoorhies.github.io/oap/.dk
  * License: GPLv2 or later
  */
  
 
-/* Check for/Enable GZIP output compression (if possible) */
+
+/* Check for/Enable GZIP output compression (if possible) - NOTE: This breaks under PHP 8.X.X! Remove or Comment out, if using PHP 8 */
 if(extension_loaded("zlib") && (ini_get("output_handler") != "ob_gzhandler"))
 add_action('wp', create_function('', '@ob_end_clean();@ini_set("zlib.output_compression", 1);'));
-/* https://wordpress.stackexchange.com/questions/1567/best-collection-of-code-for-your-functions-php-file?page=1 */
+/* https://wordpress.stackexchange.com/revisions/5841/1 */
+
+
+
+/* Remove version info from head and feeds #Security/Hardening */
+function complete_version_removal() {
+    return '';
+}
+add_filter('the_generator', 'complete_version_removal');
+/* https://wordpress.stackexchange.com/questions/1567/best-collection-of-code-for-your-functions-php-file */
+/* By: https://wordpress.stackexchange.com/users/472/derek-perkins */
+
+
+
+/* Prevents WordPress from testing ssl capability on domain.com/xmlrpc.php?rsd #Speed-optimization */
+remove_filter('atom_service_url','atom_service_url_filter');
+/* https://wordpress.stackexchange.com/revisions/1769/5 */
 
 
 
@@ -24,7 +41,8 @@ return $href;
 }
 return false;
 });
-/* https://stackoverflow.com/questions/29134113/how-to-remove-or-dequeue-google-fonts-in-wordpress-twentyfifteen */
+/* https://stackoverflow.com/questions/29134113/how-to-remove-or-dequeue-google-fonts-in-wordpress-twentyfifteen/45633445#45633445 */
+/* By: https://stackoverflow.com/users/839434/payter */
 
 
 
@@ -36,12 +54,9 @@ remove_action( 'wp_head', 'wlwmanifest_link' );
 remove_action( 'wp_head', 'wp_generator' );
 remove_action( 'wp_head', 'start_post_rel_link' );
 remove_action( 'wp_head', 'index_rel_link' );
-remove_action( 'wp_head', 'adjacent_posts_rel_link' );         // for WordPress < 3.0
+//remove_action( 'wp_head', 'adjacent_posts_rel_link' );         // for WordPress < 3.0
 remove_action( 'wp_head', 'adjacent_posts_rel_link_wp_head' ); // for WordPress >= 3.0
 }
-/* https://wordpress.stackexchange.com/questions/1567/best-collection-of-code-for-your-functions-php-file?page=1 */
-
-
 
 /* Remove extra CSS that 'Recent Comments' widget injectsb*/
 add_action( 'widgets_init', 'remove_recent_comments_style' );
@@ -52,8 +67,8 @@ $wp_widget_factory->widgets['WP_Widget_Recent_Comments'],
 'recent_comments_style'
 ));
 }
-/* https://wordpress.stackexchange.com/questions/1567/best-collection-of-code-for-your-functions-php-file?page=1 */
-
+/* https://wordpress.stackexchange.com/revisions/3816/5 */
+/* Orignally by: Andrew Ryno */
 
 
 /* Remove internal jQuery-links - and then link to the CDN-libraries, instead. 
@@ -62,7 +77,7 @@ Otherwise add/queue-up your external scripts here!
 */
 function replace_core_jquery_version(){
 if	(!is_admin()){
-/* Currently my Wordpress-installation isn't using jQuery at ALL(!!!), therefore it's for the time being unregistered and commented out - use your DEV-tool to find out what you need to add and/or comment/uncomment */	
+/* Currently my Wordpress-installation isn't using jQeury at ALL(!!!), therefore it's URI is unregistered and commented out - use your DEV-tool to find out, what your installation needs to add and/or comment/uncomment accordingly */	
 wp_deregister_script('jquery-core');
 //wp_register_script('jquery-core',"https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js",array(),'3.5.1',true);
 //wp_script_add_data('jquery-core', array( 'integrity', 'crossorigin' ) , array( 'sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==', 'anonymous' ) );
@@ -157,7 +172,7 @@ return $resized_file;
 return $resized_file;
 }   
 add_filter('image_make_intermediate_size','ajx_sharpen_resized_files',820);
-/* https://wordpress.stackexchange.com/questions/1567/best-collection-of-code-for-your-functions-php-file */
+/* https://wordpress.stackexchange.com/revisions/35526/2 */
 /* https://www.keycdn.com/support/optimus/optimize-jpeg-quality-in-wordpress */
 
 
