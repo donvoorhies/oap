@@ -48,6 +48,11 @@ This plugin's collecton of code used herein is collected, "compiled" and assembl
 
 
 Changelog:
+1.0.3ß: January 18th, 2021
+1. Additional code added, code removing version info from head and feeds and code that prevents WordPress from testing ssl capability on domain.com/xmlrpc.php?rsd 
+2. Additonal/more specifically, detailed author-references added (where possibile)
+3. PHP 8 bug-warning regarding the code, which checks for/enables GZIP output compression - currently throws an error... 
+
 1.0.2ß: January 17th, 2021
 1. Hunted down and removed/fixed some optimization bugs and minor bottle-necks
 2. Added comments referencing were the a newly-added code was found/heralds from
