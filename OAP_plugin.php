@@ -75,7 +75,7 @@ $wp_widget_factory->widgets['WP_Widget_Recent_Comments'],
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /* Remove WPCF7-code, Google ReCaptcha-code and -badge everywhere apart from the page(s) with contact-form-7 */
-/* If you're using another mail-form, then remove or comment out, and otherwise your on your own */
+/* If you're using another mail-form, then remove or comment out the following, and otherwise your on your own */
 function contactform_dequeue_scripts() {
     $load_scripts = false;
     if( is_singular() ) {
@@ -93,7 +93,7 @@ function contactform_dequeue_scripts() {
 }
 add_action( 'wp_enqueue_scripts', 'contactform_dequeue_scripts', 99 );
 /* https://wordpress.org/support/topic/recaptcha-v3-script-is-being-added-to-all-pages/#post-10983560 */
-/* To find the handler-names, I used the code at: //https://cameronjonesweb.com.au/blog/how-to-find-out-the-handle-for-enqueued-wordpress-scripts/ */
+/* To find the exact handler-names, I used the code from: //https://cameronjonesweb.com.au/blog/how-to-find-out-the-handle-for-enqueued-wordpress-scripts/ */
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -137,7 +137,7 @@ add_action(	'wp_enqueue_scripts','replace_core_jquery_version');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//This PHP-block is to be phased out, as the majority of this installations javasscripts-URIs have been programatically moved to the bottom of the HTML
+//This PHP-block is to be phased out, as the majority of this installations javascripts-URIs have been programatically moved to the bottom of the HTML - before the body end-tag
 
 /*Async/Defer Javascript*/
 //function add_defer_attribute($tag, $handle) {
@@ -209,7 +209,7 @@ add_filter('image_make_intermediate_size','ajx_sharpen_resized_files',820);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /* Custom Scripting to Move CSS and JavaScript from the Head to the Footer */
-/* First Step *//* First Step: We add and using the “preload” attribute value to - in effect - defer our external stylesheets. */
+/* First Step */
 function add_rel_preload($html, $handle, $href, $media) {
 if (is_admin())
 return $html;
@@ -219,7 +219,8 @@ EOT;
 return $html;
 }
 add_filter( 'style_loader_tag', 'add_rel_preload', 10, 4 );
-//Please read the author's (Bhagwad Park) interesting reasons for adding "rel=preload" - might not work completely as intended on Firefox, due to no default support
+//
+//Please read the author's (Bhagwad Park) interesting reasons for adding "rel=preload" - might not work completely as intended on Firefox, due to no default support here
 
 
 function hook_css() {
@@ -230,10 +231,16 @@ function hook_css() {
 <?php
 }
 add_action('wp_head', 'hook_css');
+/* Find the Critical Path CSS-selectors by using th e online tool at either: 
+https://jonassebastianohlsson.com/criticalpathcssgenerator/
+or:
+https://purifycss.online/
+*/
+
 /* https://www.namehero.com/startup/how-to-inline-and-defer-css-on-wordpress-without-plugins/ */
 
 
-/* Second Step: We now move all of the javascript (gathered and enqueued into handlers) down to the bottom of our HTML*/
+/* Second Step */
 function remove_head_scripts() {
 remove_action('wp_head', 'wp_print_scripts');
 remove_action('wp_head', 'wp_print_head_scripts', 9);
