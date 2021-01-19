@@ -137,7 +137,7 @@ add_action(	'wp_enqueue_scripts','replace_core_jquery_version');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//This is PHP-block is to be phased out, as the majority of this installations javasscripts-URIs have been programatically moved to the bottom of the HTML
+//This PHP-block is to be phased out, as the majority of this installations javasscripts-URIs have been programatically moved to the bottom of the HTML
 
 /*Async/Defer Javascript*/
 //function add_defer_attribute($tag, $handle) {
@@ -209,7 +209,7 @@ add_filter('image_make_intermediate_size','ajx_sharpen_resized_files',820);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /* Custom Scripting to Move CSS and JavaScript from the Head to the Footer */
-/* First Step */
+/* First Step *//* First Step: We add and using the “preload” attribute value to - in effect - defer our external stylesheets. */
 function add_rel_preload($html, $handle, $href, $media) {
 if (is_admin())
 return $html;
@@ -233,7 +233,7 @@ add_action('wp_head', 'hook_css');
 /* https://www.namehero.com/startup/how-to-inline-and-defer-css-on-wordpress-without-plugins/ */
 
 
-/* Second Step */
+/* Second Step: We now move all of the javascript (gathered and enqueued into handlers) down to the bottom of our HTML*/
 function remove_head_scripts() {
 remove_action('wp_head', 'wp_print_scripts');
 remove_action('wp_head', 'wp_print_head_scripts', 9);
