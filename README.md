@@ -53,6 +53,7 @@ Changelog:
 1. Matthew Horne's async-/defer-script related to adding defer/async to javascript-URIs has been commented out, soon to be removed
 2. Added code which removes all RECAPTCHA- and WPFC7-code from ALL pages except on the "Contact"-page, where it's needed
 3. Added "graphics" to seperate the various code blocks and corrected some discovered typos along the way
+4. Changed code that removes parameters/versions/scopes from scripts and styles has replaced by another more effective and solid one that renders the same function
   
 1.0.3ß: January 18th, 2021
 1. Additional code added, code removing version info from head and feeds and code that prevents WordPress from testing ssl capability on domain.com/xmlrpc.php?rsd 
