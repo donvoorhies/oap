@@ -48,6 +48,12 @@ This plugin's collecton of code used herein is collected, "compiled" and assembl
 
 
 Changelog:
+
+1.0.4ß: January 18th, 2021
+1. Matthew Horne's async-/defer-script related to adding defer/async to javascript-URIs has been commented out, soon to be removed
+2. Added code which removes all RECAPTCHA- and WPFC7-code from ALL pages except on the "Contact"-page, where it's needed
+3. Added "graphics" to seperate the various code blocks and corrected some discovered typos along the way
+  
 1.0.3ß: January 18th, 2021
 1. Additional code added, code removing version info from head and feeds and code that prevents WordPress from testing ssl capability on domain.com/xmlrpc.php?rsd 
 2. Additonal/more specifically, detailed author-references added (where possibile)
