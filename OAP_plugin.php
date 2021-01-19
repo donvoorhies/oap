@@ -105,7 +105,7 @@ add_action(	'wp_enqueue_scripts','replace_core_jquery_version');
 /* https://wordpress.stackexchange.com/questions/257317/update-jquery-version */
 /* https://www.paulund.co.uk/dequeue-styles-and-scripts-in-wordpress */
 /* The fascinating Instant.Page script is by Alexandre Dieulot (https://instant.page/) */
-/* SRI-string adding by: https://stackoverflow.com/questions/44827134/wordpress-script-with-integrity-and-crossorigin (See:cherryaustin) * /
+/* SRI-string adding by: https://stackoverflow.com/questions/44827134/wordpress-script-with-integrity-and-crossorigin (See:cherryaustin) */
 
 
 
@@ -130,13 +130,14 @@ add_filter('script_loader_tag','add_defer_attribute',10,2);
 /* Remove wp version param from any place_jquery_version enqueued scripts */
 /* Remove version from scripts and styles */
 /* Remove wp version number from scripts and styles*/
-function _remove_script_version( $src ){
-$parts = explode( '?ver', $src );
-return $parts[0];
+function remove_css_js_version( $src ) {
+    if( strpos( $src, '?ver=' ) )
+        $src = remove_query_arg( 'ver', $src );
+    return $src;
 }
-add_filter( 'script_loader_src', '_remove_script_version', 15, 1 );
-add_filter( 'style_loader_src', '_remove_script_version', 15, 1 );
-/* https://scanwp.net/blog/remove-version-information-from-scripts-and-style-files-in-wordpress/* /
+add_filter( 'style_loader_src', 'remove_css_js_version', 9999 );
+add_filter( 'script_loader_src', 'remove_css_js_version', 9999 );
+/* https://artisansweb.net/remove-version-css-js-wordpress/ */
 
 
 
