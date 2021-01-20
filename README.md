@@ -4,13 +4,15 @@
 An "anthology" of (IMO) some snazzy Wordpress-functions that I've come across over time, which I use to optimize my Wordpress-installations.
 
 The following functions this plugin quietly performs are (for now, as more functions might be added):
-- Checks if Server-side compression is switched on
+- Remove (unecessary) code and -functions in the header
+- Making the RECAPTCHA- and WPCF7-code show and function exclusively on the contact page
 - Links commonly-used jQuery-libs to a CDN
-- Removing versions + params on URI's
+- Removing versions + params (scopes) on URI's
 - Sharpen resized image files
 - Deferring/async js-files
-- Embedding "Above The Fold" Critical Path CSS,  defering CSS-files () and moving js from head to the footer
-- Minifying all HTML-used, by stripping line-breaks and unnecessary white-spaces 
+- Embedding "Above The Fold" Critical Path CSS, "defering" CSS-files () and moving js from head to the footer
+- Minifying all HTML-used, by stripping line-breaks and unnecessary white-spaces
+
 
 Installation:
 
