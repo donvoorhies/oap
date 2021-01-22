@@ -112,39 +112,28 @@ To find the handler-names, I used the code at: //https://cameronjonesweb.com.au/
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*! 
-Remove internal jQuery-links - and then link to the CDN-libraries, instead. 
-If jQuery is needed/required for your Wordpress-install - then remove the commenting on the relevant lines with the "jquery-core"-handle (See related comments below) 
-Otherwise add/queue-up your needed external scripts here!
+Add/queue-up your needed external jQuery-scripts here!
 */
 function replace_core_jquery_version(){
 if	(!is_admin()){
-/*! 
-Currently, my Wordpress-installation isn't using any jQeury at ALL(!!!), 
-therefore it's URI is currently unregistered and commented out - use your DEV-tool to find out, 
-what your installation needs to add and/or comment/uncomment accordingly 
-*/	
+	
 wp_deregister_script('jquery-core');
-//wp_register_script('jquery-core',"https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js",array(),'3.5.1',true);
-//wp_script_add_data('jquery-core', array( 'integrity', 'crossorigin' ) , array( 'sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==', 'anonymous' ) );
+wp_deregister_script('jquery-migrate');
+	
+wp_register_script('jquery-core',"https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js",array(),'3.5.1',true);
+wp_script_add_data('jquery-core', array( 'integrity', 'crossorigin' ) , array( 'sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==', 'anonymous' ) );
 
 /*! 
-If jQuery Migrate is needed(?!) - remove the commenting on the relevant line (See related comments below) 
-In general, jQuery-Migrate is no longer included/necessary from Wordpress v5.5; 
-however, if you need/use jQuery-Migrate, then remove the relevant commenting below: 
+Although, jQuery-Migrate is no longer included/necessary from Wordpress v5.5, I added it anyway; weighing in at 4kB it hardly dents the load-times!
 */ 
-
-/*! 
-If you need to use jQuery-Migrate, the remove the commenting on the next two following lines 
-*/
-//wp_deregister_script('jquery-migrate');
-//wp_enqueue_script('jquery-migrate',"https://cdnjs.cloudflare.com/ajax/libs/jquery-migrate/3.3.2/jquery-migrate.min.js",array(),'3.3.2',true);
-//wp_script_add_data( 'jquery-migrate', array( 'integrity', 'crossorigin' ) , array( 'sha512-3fMsI1vtU2e/tVxZORSEeuMhXnT9By80xlmXlsOku7hNwZSHJjwcOBpmy+uu+fyWwGCLkMvdVbHkeoXdAzBv+w==', 'anonymous' ) );
+wp_enqueue_script('jquery-migrate',"https://cdnjs.cloudflare.com/ajax/libs/jquery-migrate/3.3.2/jquery-migrate.min.js",array(),'3.3.2',true);
+wp_script_add_data( 'jquery-migrate', array( 'integrity', 'crossorigin' ) , array( 'sha512-3fMsI1vtU2e/tVxZORSEeuMhXnT9By80xlmXlsOku7hNwZSHJjwcOBpmy+uu+fyWwGCLkMvdVbHkeoXdAzBv+w==', 'anonymous' ) );
 
 wp_enqueue_script('instantpage',"https://cdnjs.cloudflare.com/ajax/libs/instant.page/5.1.0/instantpage.min.js",array(),'5.1.0',true);
 wp_script_add_data( 'instantpage', array( 'integrity', 'crossorigin' ) , array( 'sha512-1+qUtKoh9XZW7j+6LhRMAyOrgSQKenQ4mluTR+cvxXjP1Z54RxZuzstR/H9kgPXQsVB8IW7DMDFUJpzLjvhGSQ==', 'anonymous' ));
 }
 }
-add_action(	'wp_enqueue_scripts','replace_core_jquery_version');
+add_action('wp_enqueue_scripts','replace_core_jquery_version');
 /*! 
 https://wordpress.stackexchange.com/questions/257317/update-jquery-version
 https://www.paulund.co.uk/dequeue-styles-and-scripts-in-wordpress
