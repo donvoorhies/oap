@@ -389,4 +389,3 @@ add_action('get_header', 'flhm_wp_html_compression_start');
 /*! 
 https://zuziko.com/tutorials/how-to-minify-html-in-wordpress-without-a-plugin/ by David Green (Note: EFFIN' BRILLIANT!!!) 
 */
-ob_end_flush();
