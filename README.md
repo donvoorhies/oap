@@ -6,11 +6,11 @@ An "anthology" of (IMO) some snazzy Wordpress-functions that I've come across ov
 The following functions this plugin quietly performs are (for now, as more functions might be added):
 - Remove (unecessary) code and -functions in the header
 - Making the RECAPTCHA- and WPCF7-code show and function exclusively on the contact page
-- Links commonly-used jQuery-libs to a CDN
+- Links commonly-used jQuery-libs (in Wordpress) to a CDN
 - Removing versions + params (scopes) on URI's
-- Sharpen resized image files
+- Sharpen resized image files (jpeg)
 - Deferring/async js-files
-- Embedding "Above The Fold" Critical Path CSS, "defering" CSS-files () and moving js from head to the footer
+- Embedding "Above The Fold" Critical Path CSS, "defering" CSS-files and moving js from head to the footer
 - Minifying all HTML-used, by stripping line-breaks and unnecessary white-spaces
 
 
