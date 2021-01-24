@@ -10,6 +10,19 @@
  */
  
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/* Disbable Self-Pingbacks*/
+function wpsites_disable_self_pingbacks( &$links ) {
+ foreach ( $links as $l => $link )
+ if ( 0 === strpos( $link, get_option( 'home' ) ) )
+ unset($links[$l]);
+}
+add_action( 'pre_ping', 'wpsites_disable_self_pingbacks' );
+
+/* 
+Source: Brian Jackson: "How To Speed-up wordpress" (PDF)- kinsta.com
+*/
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*! 
 Remove version info from head and feeds #Security/Hardening 
