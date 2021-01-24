@@ -4,6 +4,7 @@
 An "anthology" of (IMO) some snazzy Wordpress-functions that I've come across over time, which I use to optimize my Wordpress-installations.
 
 The following functions this plugin quietly performs are (for now, as more functions might be added):
+- Self-Pingbacks disabled
 - Remove (unecessary) code and -functions in the header
 - Making the RECAPTCHA- and WPCF7-code show and function exclusively on the contact page
 - Links commonly-used jQuery-libs (in Wordpress) to a CDN
