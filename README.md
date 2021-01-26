@@ -53,12 +53,14 @@ This plugin's collecton of code used herein is collected, "compiled" and assembl
 
 
 Changelog:
+1.0.0 [RC-1]: January 25th, 2021  
+- Pingbacks and Self-Pingbacks disabled
 
 1.0.5ß: January 19th, 2021
-  1. Removed redundant and/or commented out code, which wasn't used, obsolete or troublesome, as previously announced
-  2. Refactored the code's comments and removed typos, missing words(!) and bad grammar
-  3. Corrected the wording for the plugin's description seen on the Wordpress-installation's plugins-page.
-  4. Getting things ready so the plugin can now evolve to "Release Candidate" (RC)-status
+1. Removed redundant and/or commented out code, which wasn't used, obsolete or troublesome, as previously announced
+2. Refactored the code's comments and removed typos, missing words(!) and bad grammar
+3. Corrected the wording for the plugin's description seen on the Wordpress-installation's plugins-page.
+4. Getting things ready so the plugin can now evolve to "Release Candidate" (RC)-status
  
 1.0.4ß: January 18th, 2021
 1. Matthew Horne's async-/defer-script related to adding defer/async to javascript-URIs has been commented out, soon to be removed
