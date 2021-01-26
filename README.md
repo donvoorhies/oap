@@ -5,7 +5,7 @@ An "anthology" of (IMO) some snazzy Wordpress-functions that I've come across ov
 
 The following functions this plugin quietly performs are (as of v.1.0.0 [RC-1], 01/25/2021):
 - Pingbacks and Self-Pingbacks disabled
-- Removed (unecessary) code and -functions in the header
+- Removed (unnecessary) code and -functions in the header
 - Making the RECAPTCHA- and WPCF7-code show and function exclusively on the contact page
 - Links commonly-used jQuery-libs (in Wordpress) to a CDN
 - Adds Alexandre Dieulot’s fascinating “instant.page”-functionality
