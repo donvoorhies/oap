@@ -53,6 +53,14 @@ This plugin's collecton of code used herein is collected, "compiled" and assembl
 
 
 Changelog:
+
+1.0.0 [RC-2]: March 9th, 2021  
+- Code cleaned up, refactored and restructured (actually: "Grouped and reordered")
+- Some earlier experimental-/trial-code performed prior to RC-2 now removed 
+- WP REST API disabled
+- JPEG-sharpening code removed
+- Although not required/necessary in Wordpress v5.5.X, I've included jQuery Migrate 3.3.2 from cdnjs.com (albeit commented out), if needed due to elderly plugins, themes etc. 
+
 1.0.0 [RC-1]: January 25th, 2021  
 - Pingbacks and Self-Pingbacks disabled
 
