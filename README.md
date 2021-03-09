@@ -3,15 +3,14 @@
 
 An "anthology" of (IMO) some snazzy Wordpress-functions that I've come across over time, which I use to optimize my Wordpress-installations.
 
-The following functions this plugin quietly performs are (as of v.1.0.0 [RC-1], 01/25/2021):
-- Pingbacks and Self-Pingbacks disabled
-- Removed (unnecessary) code and -functions in the header
+The following functions this plugin quietly performs are (as of v.1.0.0 [RC-2], 03/09/2021):
+- WP REST API, Pingbacks and Self-Pingbacks disabled
+- Removed (unnecessary) code and -functions in the header (see the changelog for details)
 - Making the RECAPTCHA- and WPCF7-code show and function exclusively on the contact page
-- Links commonly-used jQuery-libs (in Wordpress) to a CDN
+- Links and uses the newest, commonly-used jQuery-lib(s) (in Wordpress) from a CDN (currrently cdnjs.com)
 - Adds Alexandre Dieulot’s fascinating “instant.page”-functionality
 - Adds SRI hashes and parameters on relevant URI’s (for obvious security reasons; if and where possible)
 - Removing versions + params (scopes) on URI's
-- Sharpen resized image files (jpeg)
 - Deferring/async js-files
 - Embedding "Above The Fold" Critical Path CSS, "defering" CSS-files and moving js from head to the footer
 - Minifying all HTML-used, by stripping line-breaks and unnecessary white-spaces
