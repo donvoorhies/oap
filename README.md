@@ -36,7 +36,7 @@ You can find the "Above The Fold" Critical Path CSS-string by using Jonas Sebast
 
 https://jonassebastianohlsson.com/criticalpathcssgenerator/
 
-Follow the instructions here, and copy and paste the generated string into the file (OAP_plugin.php; line 236 - or thereabouts) between the marked "style"-tags (look for these, along with the identifiying comment:
+Follow the instructions here, and copy and paste the generated string into the file (OAP_plugin.php; line 303 - or thereabouts) between the marked "style"-tags (look for these, along with the identifiying comment:
 "/* INSERT GENERATED "ABOVE THE FOLD" CRITICAL PATH CSS-STRING HERE - EITHER UNDER THIS LINE OR BY REPLACING THIS LINE WITH THE GENERATED STRING...! */
 ");
 you can use your webhost's editor to perform this operation. 
