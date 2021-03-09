@@ -4,7 +4,7 @@
 An "anthology" of (IMO) some snazzy Wordpress-functions that I've come across over time, which I use to optimize my Wordpress-installations.
 
 The following functions this plugin quietly performs are (as of v.1.0.0 [RC-2], 03/09/2021):
-- WP REST API, Pingbacks and Self-Pingbacks disabled
+- Pingbacks and Self-Pingbacks are disabled
 - Removed (unnecessary) code and -functions in the header (see the changelog for details)
 - Making the RECAPTCHA- and WPCF7-code show and function exclusively on the contact page
 - Links and uses the newest, commonly-used jQuery-lib(s) (in Wordpress) from a CDN (currently cdnjs.com)
@@ -56,9 +56,8 @@ Changelog:
 1.0.0 [RC-2]: March 9th, 2021  
 1. Code cleaned up, refactored and restructured (actually: "Grouped and reordered")
 2. Some earlier experimental-/trial-code performed prior to RC-2 now removed 
-3. WP REST API disabled
-4. JPEG-sharpening code removed
-5. Although not required/necessary in Wordpress v5.5.X, I've included jQuery Migrate 3.3.2 from cdnjs.com (albeit commented out), if needed due to elderly plugins, themes etc. 
+3. JPEG-sharpening code removed
+4. Although not required/necessary in Wordpress v5.5.X, I've included jQuery Migrate 3.3.2 from cdnjs.com (albeit commented out), if needed due to elderly plugins, themes etc. 
 
 1.0.0 [RC-1]: January 25th, 2021  
 1. Pingbacks and Self-Pingbacks disabled
