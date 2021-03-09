@@ -7,7 +7,7 @@ The following functions this plugin quietly performs are (as of v.1.0.0 [RC-2], 
 - WP REST API, Pingbacks and Self-Pingbacks disabled
 - Removed (unnecessary) code and -functions in the header (see the changelog for details)
 - Making the RECAPTCHA- and WPCF7-code show and function exclusively on the contact page
-- Links and uses the newest, commonly-used jQuery-lib(s) (in Wordpress) from a CDN (currrently cdnjs.com)
+- Links and uses the newest, commonly-used jQuery-lib(s) (in Wordpress) from a CDN (currently cdnjs.com)
 - Adds Alexandre Dieulot’s fascinating “instant.page”-functionality
 - Adds SRI hashes and parameters on relevant URI’s (for obvious security reasons; if and where possible)
 - Removing versions + params (scopes) on URI's
