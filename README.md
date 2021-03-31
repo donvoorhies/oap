@@ -54,7 +54,7 @@ This plugin's collecton of code used herein is collected, "compiled" and assembl
 Changelog:
 
 1.0.0 : March 30th, 2021  
-No major changes implemented (actually none), and now elevated to fully-fledged, official release. 
+No major changes implemented (actually none), and now elevated to a fully-fledged, official release. 
 
 1.0.0 [RC-2]: March 9th, 2021  
 1. Code cleaned up, refactored and restructured (actually: "Grouped and reordered")
