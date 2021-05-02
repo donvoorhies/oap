@@ -3,7 +3,7 @@
  * Plugin Name: Don's Optimization Anthology Plugin
  * Plugin URI: https://github.com/donvoorhies/oap
  * Description: An "anthology" of (IMO) some snazzy functions that I've come across over time, and which I usually hardcode into 'functions.php' to optimize my Wordpress-installs (Including: removing some (unecessary) code and -functions in the header, making the RECAPTCHA- and WPCF7-code function exclusively on the contact page, linking common jQuery-libs to a CDN, removing versions + params (scopes) on URI's, sharpen resized image files, deferring/async js, defering CSS-files and moving js from head to to footer, minimize the used HTML-code)
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author:  Various Contributors and sources | Compiled and assembled by Don W.Voorhies (See the referenced URLs regarding the specific contributing-credits)...
  * Author URI: https://donvoorhies.github.io/oap/
  * License: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (extended with additional conditions)
