@@ -53,7 +53,7 @@ This plugin's collecton of code used herein is collected, "compiled" and assembl
 
 Changelog:
 1.0.1 : May 1st, 2021  
-Miniscule optimization update: The registering and enquing of the core jQuery-lib now updated to use v3.6.0 (the URI and the SRI updated). 
+Miniscule optimization update: The registering and enquing of the core jQuery-lib is now updated to use v3.6.0 (the URI and the SRI has been updated). 
 
 1.0.0 : March 30th, 2021  
 No major changes implemented (actually none), and now elevated to a fully-fledged, official release. 
