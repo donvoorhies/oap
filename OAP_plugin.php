@@ -204,8 +204,8 @@ wp_deregister_script('jquery-core');
 //wp_deregister_script('jquery-migrate');
 
 	
-wp_register_script('jquery-core',"https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js",array(),'3.5.1',true);
-wp_script_add_data('jquery-core', array( 'module','integrity','crossorigin' ) , array( 'sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==', 'anonymous' ) );
+wp_register_script('jquery-core',"https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js",array(),'3.6.0',true);
+wp_script_add_data('jquery-core', array( 'module','integrity','crossorigin' ) , array( 'sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==', 'anonymous' ) );
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 /*! 
 Although, jQuery-Migrate is no longer included/necessary from Wordpress v5.5, I added it anyway, if one should need it for whatever reason!
