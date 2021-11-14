@@ -13,7 +13,6 @@ The following functions this plugin quietly performs are (as of v.1.0.1, 05/01/2
 - Removing versions + params (scopes) on URI's
 - Deferring/async js-files
 - Embedding "Above The Fold" Critical Path CSS, "defering" CSS-files and moving js from head to the footer
-- Minifying all HTML-used, by stripping line-breaks and unnecessary white-spaces
 
 
 Installation:
@@ -53,11 +52,10 @@ This plugin's collecton of code used herein is collected, "compiled" and assembl
 
 Changelog:
 1.0.2 : November 15th, 2021  
-1. HTML-minimization code by David Greene now uncommented/deactivated, as it apparently triggers Content Layout Shift
-ght be removedlated)
-3. Automatic meta-description creator from post-content added
-4.0 : May 1st, 2021  
+1. HTML-minimization code by David Greene now uncommented/deactivated, as it apparently triggers Content Layout Shift (Might be removed lated)
+2. Automatic meta-description creator from post-content now added during the Summer of '21 
 
+1.0.1 : May 1st, 2021  
 Miniscule optimization update: The registering and enquing of the core jQuery-lib is now updated to use v3.6.0 (the URI and the SRI has been updated). 
 
 1.0.0 : March 30th, 2021  
