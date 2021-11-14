@@ -52,7 +52,12 @@ This plugin's collecton of code used herein is collected, "compiled" and assembl
 
 
 Changelog:
-1.0.1 : May 1st, 2021  
+1.0.2 : November 15th, 2021  
+1. HTML-minimization code by David Greene now uncommented/deactivated, as it apparently triggers Content Layout Shift
+ght be removedlated)
+3. Automatic meta-description creator from post-content added
+4.0 : May 1st, 2021  
+
 Miniscule optimization update: The registering and enquing of the core jQuery-lib is now updated to use v3.6.0 (the URI and the SRI has been updated). 
 
 1.0.0 : March 30th, 2021  
