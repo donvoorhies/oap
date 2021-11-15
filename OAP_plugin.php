@@ -438,7 +438,7 @@ $str = str_replace("\n",  '', $str);
 $str = str_replace("\r",  '', $str);
 while (stristr($str, '  '))
 {
-7'1$str = str_replace('  ', ' ', $str);
+$str = str_replace('  ', ' ', $str);
 }   
 return $str;
 }
