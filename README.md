@@ -1,7 +1,7 @@
 # OAP
 "Don's Optimization Anthology Plugin" (abbrev.: OAP)
 
-An "anthology" of (IMO) some snazzy Wordpress-functions that I've come across over time, which I use to optimize my Wordpress-installations.
+An "anthology" of (IMO) some snazzy Wordpress-functions that I've come across over time, which I earlier used to optimize my Wordpress-installations with.
 
 The following functions this plugin quietly performs are (as of v.1.0.1, 05/01/2021):
 - Pingbacks and Self-Pingbacks are disabled
