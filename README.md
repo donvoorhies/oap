@@ -3,7 +3,7 @@
 
 An "anthology" of (IMO) some snazzy Wordpress function-codes that I've come across over time, which I (earlier) used to optimize Wordpress-installations with.
 
-The following functions this plugin quietly performs are (as of v.1.0.2, 11/15/2021):
+The following functions this plugin quietly performs are (as of v.1.0.2, 05/20/2021):
 - Pingbacks and Self-Pingbacks are disabled
 - Removed (unnecessary) code and -functions in the header (see the changelog for details)
 - Making the RECAPTCHA- and WPCF7-code show and function exclusively on the contact page
@@ -51,6 +51,11 @@ This plugin's collecton of code used herein is collected, "compiled" and assembl
 
 
 Changelog:
+1.0.3 : November 15th,2021  
+1. Missing "data-instant-intensity"-parameter with the value="viewport" added to activate instant.page (Sorry, I forgot to add this initially!)
+2. Script to find loaded scripts and styles (Source: wpbeaches.com) added - commented out but can used to find which scripts and style are used for optimization-purposes
+
+
 1.0.2 : November 15th, 2021  
 Automatic meta-description creator from post-content now added during the Summer of '21 
 
