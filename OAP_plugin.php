@@ -2,8 +2,8 @@
 /*!
  * Plugin Name: Don's Optimization Anthology Plugin
  * Plugin URI: https://github.com/donvoorhies/oap
- * Description: An "anthology" of (IMO) some snazzy function-codes that I've come across over time, and which I usually hardcoded into 'functions.php' to optimize Wordpress-installs with; for more details regarding this plugin's different functionalites, as for accessing the latest updated version of this plugin - please go visit: https://github.com/donvoorhies/oap
- * Version (Installed): 1.0.2
+ * Description: An "anthology" of (IMO) some snazzy functions that I've come across over time, and which I earlier usually hardcoded into 'functions.php' to optimize my Wordpress-installs with; for more details regarding this plugin's different functionalites, as for accessing the latest updated version of this plugin - please go visit: https://github.com/donvoorhies/oap
+ * Version (Installed): 1.0.3
  * Author:  Various Contributors and sources | Compiled and assembled by Don W.Voorhies (See the referenced URLs regarding the specific contributing-credits)...
  * Author URI: https://donvoorhies.github.io/oap/
  * License: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (extended with additional conditions)
@@ -160,11 +160,25 @@ https://artisansweb.net/remove-version-css-js-wordpress/
 */
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*!
+Adds the "data-instant-intensity"-parameter with the value="viewport" to the body-tag; used in connction with the Instant.Page-script by Alexandre Dieulot
+*/
+add_action("wp_footer", "your_theme_adding_extra_attributes"); 
 
+function your_theme_adding_extra_attributes(){
+    ?>
+    <script>
+        let body = document.getElementsByTagName("body");
+        body[0].setAttribute("data-instant-intensity", "viewport"); 
+</script>
+<?php }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*! 
 Remove WPCF7-code, Google ReCaptcha-code and -badge everywhere sitewide, apart from the page(s) using contact-form-7 
 If you're using another mail-form, then remove or comment out, and otherwise you're on your own 
 */
+
 function contactform_dequeue_scripts() {
     $load_scripts = false;
     if( is_singular() ) {
@@ -174,10 +188,10 @@ function contactform_dequeue_scripts() {
 		}
     }
     if( ! $load_scripts ) {
-        	wp_dequeue_script('wpcf7-recaptcha-js-extra');
+        wp_dequeue_script('wpcf7-recaptcha-js-extra');
 		wp_dequeue_script('wpcf7-recaptcha');
 		wp_dequeue_script('google-recaptcha');
-        	wp_dequeue_style('contact-form-7');		
+        wp_dequeue_style('contact-form-7');		
     }
 }
 add_action( 'wp_enqueue_scripts', 'contactform_dequeue_scripts', 99 );
@@ -199,21 +213,22 @@ The main intention here is as follows:
 */
 function replace_add_core_jquery_version(){
 if	(!is_admin()){
-	
 wp_deregister_script('jquery-core');
 //wp_deregister_script('jquery-migrate');
 
-	
+
 wp_register_script('jquery-core',"https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js",array(),'3.6.0',true);
 wp_script_add_data('jquery-core', array( 'module','integrity','crossorigin' ) , array( 'sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==', 'anonymous' ) );
+
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 /*! 
 Although, jQuery-Migrate is no longer included/necessary from Wordpress v5.5, I added it anyway, if one should need it for whatever reason!
 Uncomment and enqueue, if this should otherwise be the case...
 */ 
-//wp_enqueue_script('jquery-migrate',"https://cdnjs.cloudflare.com/ajax/libs/jquery-migrate/3.3.2/jquery-migrate.min.js",array(),'3.3.2',true);
-//wp_script_add_data( 'jquery-migrate', array( 'module','integrity','crossorigin' ) , array( 'sha512-3fMsI1vtU2e/tVxZORSEeuMhXnT9By80xlmXlsOku7hNwZSHJjwcOBpmy+uu+fyWwGCLkMvdVbHkeoXdAzBv+w==', 'anonymous' ) );
-
+/*
+wp_enqueue_script('jquery-migrate',"https://cdnjs.cloudflare.com/ajax/libs/jquery-migrate/3.3.2/jquery-migrate.min.js",array(),'3.3.2',true);
+wp_script_add_data( 'jquery-migrate', array( 'module','integrity','crossorigin' ) , array( 'sha512-3fMsI1vtU2e/tVxZORSEeuMhXnT9By80xlmXlsOku7hNwZSHJjwcOBpmy+uu+fyWwGCLkMvdVbHkeoXdAzBv+w==', 'anonymous' ) );
+*/
 
 wp_enqueue_script('instantpage',"https://cdnjs.cloudflare.com/ajax/libs/instant.page/5.1.0/instantpage.min.js",array(),'5.1.0',true);
 wp_script_add_data( 'instantpage', array( 'module','integrity','crossorigin' ) , array( 'sha512-1+qUtKoh9XZW7j+6LhRMAyOrgSQKenQ4mluTR+cvxXjP1Z54RxZuzstR/H9kgPXQsVB8IW7DMDFUJpzLjvhGSQ==', 'anonymous' ));
@@ -268,7 +283,6 @@ function hook_css() {
 ?>
 <style>
 <!--INSERT GENERATED "ABOVE THE FOLD" CRITICAL PATH CSS-STRING HERE - EITHER IMMEDIATELY BELOW THIS LINE OR BY REPLACING THIS LINE WITH THE GENERATED STRING...!-->
-
 </style>
 <?php
 }
@@ -279,10 +293,10 @@ https://jonassebastianohlsson.com/criticalpathcssgenerator/
 or:
 https://purifycss.online/
 */
+	
 /*! 
 https://www.namehero.com/startup/how-to-inline-and-defer-css-on-wordpress-without-plugins/ 
 */
-
 
 /*! 
 Second Step: We now move all of the javascript (gathered and enqueued into handlers) down to the bottom of our HTML
@@ -458,3 +472,38 @@ add_action('get_header', 'flhm_wp_html_compression_start');
 */
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*add_action( 'wp_print_scripts', 'prefix_show_me_the_scripts' );
+/**
+* Show what Scripts and Styles are running on a page
+* Source: https://wpbeaches.com/show-all-loaded-scripts-and-styles-on-a-page-in-wordpress/
+*/
+/*
+function prefix_show_me_the_scripts() {
+	global $wp_scripts;
+	global $wp_styles;
+
+	echo 'SCRIPTS<br>';
+	foreach( $wp_scripts->queue as $handle ) :
+        echo $handle . ' <br> ';
+	endforeach;
+		
+	echo 'STYLES<br>';
+	foreach( $wp_styles->queue as $handle ) :
+	echo $handle . ' <br> ';
+	endforeach;	
+}
+*/
+
+/**
+The following is a code-example for unloading all styles found ("manually") by the code above from wpbeaches,
+as the stylesheet-selectors are already included further up under the function "hook_css"
+
+add_action('wp_print_styles', 'my_deregister_styles', 100);
+
+function my_deregister_styles() {
+wp_deregister_style('');
+
+/*repeat wp_deregister_style('stylename') as needed */
+
+}
+*/
