@@ -52,7 +52,7 @@ This plugin's collecton of code used herein is collected, "compiled" and assembl
 
 Changelog:
 1.0.3 : November 15th,2021  
-1. Missing "data-instant-intensity"-parameter with the value="viewport" added to activate instant.page (Sorry, I forgot to add this initially!)
+1. Missing "data-instant-intensity"-parameter with the value="viewport" added to activate the "instant.page"-script (Sorry, I forgot to add this initially!) (Sorry, I forgot to add this initially!)
 2. Script to find loaded scripts and styles (Source: wpbeaches.com) added - commented out but can used to find which scripts and style are used - solely here for optimization-purposes
 
 
