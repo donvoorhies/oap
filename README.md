@@ -3,7 +3,7 @@
 
 An "anthology" of (IMO) some snazzy Wordpress function-codes that I've come across over time, which I (earlier) used to optimize Wordpress-installations with.
 
-The following functions this plugin quietly performs are (as of v.1.0.2, 05/20/2021):
+The following functions this plugin quietly performs are (as of v.1.0.2, 05/20/2022):
 - Pingbacks and Self-Pingbacks are disabled
 - Removed (unnecessary) code and -functions in the header (see the changelog for details)
 - Making the RECAPTCHA- and WPCF7-code show and function exclusively on the contact page
