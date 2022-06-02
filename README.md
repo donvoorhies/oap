@@ -6,8 +6,8 @@ An "anthology" of (IMO) some snazzy Wordpress function-codes that I've come acro
 The following functions this plugin quietly performs are (as of v.1.0.3, 05/20/2022):
 - Pingbacks and Self-Pingbacks are disabled
 - Removed (unnecessary) code and -functions in the header (see the changelog for details)
-- Making the RECAPTCHA- and WPCF7-code show and function exclusively on the contact page
-- Links and uses the newest, commonly-used jQuery-lib(s) (in Wordpress) from a CDN (currently cdnjs.com)
+- Making the RECAPTCHA-function now run silently on the contact page (RECAPTCHA-logo now hidden)
+- Links and s ready to use the newest, commonly-used jQuery-lib(s) (in Wordpress) from a CDN (currently cdnjs.com)
 - Adds Alexandre Dieulot’s fascinating “instant.page”-functionality
 - Adds SRI hashes and parameters on relevant URI’s (for obvious security reasons; if and where possible)
 - Removing versions + params (scopes) on URI's
