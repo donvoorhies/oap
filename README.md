@@ -3,7 +3,7 @@
 
 An "anthology" of (IMO) some snazzy Wordpress function-codes that I've come across over time, which I (earlier) used to optimize Wordpress-installations with.
 
-The following functions this plugin quietly performs are (as of v.1.0.3, 05/20/2022):
+The following functions this plugin quietly performs are (as of v.1.0.5, 06/25/2022):
 - Pingbacks and Self-Pingbacks are disabled
 - Removed (unnecessary) code and -functions in the header (see the changelog for details)
 - Making the RECAPTCHA-function now run silently on the contact page (RECAPTCHA-logo now hidden)
@@ -13,6 +13,7 @@ The following functions this plugin quietly performs are (as of v.1.0.3, 05/20/2
 - Removing versions + params (scopes) on URI's
 - Deferring/async js-files
 - Embedding "Above The Fold" Critical Path CSS, "defering" CSS-files and moving js from head to the footer
+- NEW!: Google Analytics v.4.0 (GA4)-support and Google Tag Manager-support, too (although the latter is optional)
 
 
 Installation:
@@ -30,14 +31,15 @@ Configuration:
 This plugin will work right out of the box - almost...
 
 For now, you're going to have get hold of the "Above The Fold" Critical Path CSS, and insert the generated string into the code in file, OAP_plugin.php.
-You can find the "Above The Fold" Critical Path CSS-string by using Jonas Sebastian Ohlsson's generator at: 
+You can find the "Above The Fold" Critical Path CSS-string by using - for example -Jonas Sebastian Ohlsson's generator at: 
 
 https://jonassebastianohlsson.com/criticalpathcssgenerator/
 
-Follow the instructions here, and copy and paste the generated string into the file (OAP_plugin.php; line 303 - or thereabouts) between the marked "style"-tags (look for these, along with the identifiying comment:
-"/* INSERT GENERATED "ABOVE THE FOLD" CRITICAL PATH CSS-STRING HERE - EITHER UNDER THIS LINE OR BY REPLACING THIS LINE WITH THE GENERATED STRING...! */
-");
+Follow the instructions here, and copy and paste the generated string into the file (OAP_plugin.php; now on line 12(!) - or thereabouts); look for the following code-string, along with the identifiying comment:
+$CSS_ATF_string='/*(REMOVE THIS STRING BY PASTING THE GENERATED ABOVE-THE-FOLD CSS HERE IN BETWEEN THE APOSTROPHES)*/';
 you can use your webhost's editor to perform this operation. 
+
+Furthermore you'lle have to do similar for now in connenction by inserting the Google Analytics v.4 Measurement ID (as for the Google Tag Manager Workspace ID, too).
 
 Planned/"Wish-list":
 
