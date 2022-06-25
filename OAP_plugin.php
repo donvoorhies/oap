@@ -3,14 +3,21 @@
  * Plugin Name: Don's Optimization Anthology Plugin
  * Plugin URI: https://github.com/donvoorhies/oap
  * Description: An "anthology" of (IMO) some snazzy functions that I've come across over time, and which I earlier usually hardcoded into 'functions.php' to optimize my Wordpress-installs with; for more details regarding this plugin's different functionalites, as for accessing the latest updated version of this plugin - please go visit: https://github.com/donvoorhies/oap
- * Version (Installed): 1.0.3
+ * Version (Installed): 1.0.5
  * Author:  Various Contributors and sources | Compiled and assembled by Don W.Voorhies (See the referenced URLs regarding the specific contributing-credits)...
  * Author URI: https://donvoorhies.github.io/oap/
  * License: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (extended with additional conditions)
  */
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+$CSS_ATF_string='/*(REMOVE THIS STRING BY PASTING THE GENERATED ABOVE-THE-FOLD CSS HERE IN BETWEEN THE APOSTROPHES)*/';
 
+$GA4_string='/*(REMOVE THIS STRING BY PASTING GOOGLE ANALYTICS v.4 MEASUREMENT ID (NOTE: "MEASUREMENT ID"!) HERE IN BETWEEN THE APOSTROPHES)*/';
+
+$GTM_string='/*(REMOVE THIS STRING BY PASTING GOOGLE TAG MANAGER WORKSPACE ID HERE IN BETWEEN THE APOSTROPHES)*/';
+
+if(!is_admin()){
+/*! Quick-fix by encapsulating all of the functions in a conditional statement so the back-end content-editing functionalites won't get crippled (as a seen as a "white-page-of-death" as experienced after the Wordpress 6.0-update), when running the admin side code (i.e.: back-end); the switching off here of this plugin ONLY effects the back-end!
+*/
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*! 
@@ -23,11 +30,6 @@ return $href;
 }
 return false;
 });
-/*! 
-Sources:
-https://stackoverflow.com/questions/29134113/how-to-remove-or-dequeue-google-fonts-in-wordpress-twentyfifteen/45633445#45633445
-https://stackoverflow.com/users/839434/payter 
-*/
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -35,10 +37,6 @@ https://stackoverflow.com/users/839434/payter
 Prevents WordPress from testing ssl capability on domain.com/xmlrpc.php?rsd #Speed-optimization 
 */
 remove_filter('atom_service_url','atom_service_url_filter');
-
-/*! 
-https://wordpress.stackexchange.com/revisions/1769/5 
-*/
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*! 
@@ -48,12 +46,6 @@ function complete_version_removal() {
     return '';
 }
 add_filter('the_generator', 'complete_version_removal');
-
-/*! 
-Sources:
-https://wordpress.stackexchange.com/questions/1567/best-collection-of-code-for-your-functions-php-file
-https://wordpress.stackexchange.com/users/472/derek-perkins 
-*/
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -72,9 +64,6 @@ remove_action( 'wp_head', 'wp_shortlink_wp_head');
 //remove_action( 'wp_head', 'adjacent_posts_rel_link' );         // for WordPress < 3.0
 remove_action( 'wp_head', 'adjacent_posts_rel_link_wp_head' ); // for WordPress >= 3.0
 }
-/*!
-https://bhoover.com/remove-unnecessary-code-from-your-wordpress-blog-header/
-*/
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -109,10 +98,6 @@ function wp_xmlrpc_methods( $methods ) { // Disable XML-RPC methods
     return $methods;
 }
 
-/**
-https://wordpress.stackexchange.com/questions/190346/disabling-pingback-and-trackback-notifications 
-*/ 
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /* Disbable Self-Pingbacks*/
@@ -123,12 +108,7 @@ function wpsites_disable_self_pingbacks( &$links ) {
 }
 add_action( 'pre_ping', 'wpsites_disable_self_pingbacks' );
 
-/* 
-Source: Brian Jackson: "How To Speed-up wordpress" (PDF)- kinsta.com
-*/
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 /*! 
 Remove extra CSS that the 'Recent Comments' widget injects
 */
@@ -140,8 +120,6 @@ $wp_widget_factory->widgets['WP_Widget_Recent_Comments'],
 'recent_comments_style'
 ));
 }
-/*! https://wordpress.stackexchange.com/revisions/3816/5 */
-/*! Orignally by: Andrew Ryno */
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*! 
@@ -155,14 +133,12 @@ function remove_css_js_version( $src ) {
 }
 add_filter( 'style_loader_src', 'remove_css_js_version', 9999 );
 add_filter( 'script_loader_src', 'remove_css_js_version', 9999 );
-/*! 
-https://artisansweb.net/remove-version-css-js-wordpress/ 
-*/
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*!
-Adds the "data-instant-intensity"-parameter with the value="viewport" to the body-tag; used in connction with the Instant.Page-script by Alexandre Dieulot
+Adds the "data-instant-intensity"-parameter with the value="viewport" to the body-tag; used in connction with the Instant.Page-script by Alexandre Dieulot - TO BE ONLY ACTIVATED IF PAGES WITH A QUERY STRING (a “?”) IN THEIR URL ARE USED 
 */
+/*
 add_action("wp_footer", "your_theme_adding_extra_attributes"); 
 
 function your_theme_adding_extra_attributes(){
@@ -172,6 +148,7 @@ function your_theme_adding_extra_attributes(){
         body[0].setAttribute("data-instant-intensity", "viewport"); 
 </script>
 <?php }
+*/
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*! 
@@ -196,8 +173,6 @@ function contactform_dequeue_scripts() {
 }
 add_action( 'wp_enqueue_scripts', 'contactform_dequeue_scripts', 99 );
 /*! 
-https://wordpress.org/support/topic/recaptcha-v3-script-is-being-added-to-all-pages/#post-10983560
-
 NOTE:
 To find the handler-names, I used the code at: //https://cameronjonesweb.com.au/blog/how-to-find-out-the-handle-for-enqueued-wordpress-scripts/ 
 */
@@ -217,7 +192,7 @@ wp_deregister_script('jquery-core');
 //wp_deregister_script('jquery-migrate');
 
 
-wp_register_script('jquery-core',"https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js",array(),'3.6.0',true);
+wp_register_script('jquery-core','https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js',array(),'3.6.0',true);
 wp_script_add_data('jquery-core', array( 'module','integrity','crossorigin' ) , array( 'sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==', 'anonymous' ) );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -226,11 +201,11 @@ Although, jQuery-Migrate is no longer included/necessary from Wordpress v5.5, I 
 Uncomment and enqueue, if this should otherwise be the case...
 */ 
 /*
-wp_enqueue_script('jquery-migrate',"https://cdnjs.cloudflare.com/ajax/libs/jquery-migrate/3.3.2/jquery-migrate.min.js",array(),'3.3.2',true);
+wp_enqueue_script('jquery-migrate','"'https://cdnjs.cloudflare.com/ajax/libs/jquery-migrate/3.3.2/jquery-migrate.min.js',array(),'3.3.2',true);
 wp_script_add_data( 'jquery-migrate', array( 'module','integrity','crossorigin' ) , array( 'sha512-3fMsI1vtU2e/tVxZORSEeuMhXnT9By80xlmXlsOku7hNwZSHJjwcOBpmy+uu+fyWwGCLkMvdVbHkeoXdAzBv+w==', 'anonymous' ) );
 */
 
-wp_enqueue_script('instantpage',"https://cdnjs.cloudflare.com/ajax/libs/instant.page/5.1.0/instantpage.min.js",array(),'5.1.0',true);
+wp_enqueue_script('instantpage','https://cdnjs.cloudflare.com/ajax/libs/instant.page/5.1.0/instantpage.min.js',array(),'5.1.0',true);
 wp_script_add_data( 'instantpage', array( 'module','integrity','crossorigin' ) , array( 'sha512-1+qUtKoh9XZW7j+6LhRMAyOrgSQKenQ4mluTR+cvxXjP1Z54RxZuzstR/H9kgPXQsVB8IW7DMDFUJpzLjvhGSQ==', 'anonymous' ));
 
 }
@@ -245,12 +220,6 @@ Use of SRI is recommended as a best-practice, whenever libraries are loaded from
 */
 
 /*! 
-Sources:
-https://wordpress.stackexchange.com/questions/257317/update-jquery-version
-https://www.paulund.co.uk/dequeue-styles-and-scripts-in-wordpress
-The fascinating Instant.Page script is by Alexandre Dieulot (https://instant.page/)
-SRI-string adding by: https://stackoverflow.com/questions/44827134/wordpress-script-with-integrity-and-crossorigin (See:cherryaustin's comment) 
-*/
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -275,16 +244,9 @@ due to no default support; however, it looks like he's concatenated the followin
 <link rel="preload" href="/path/to/my.css" as="style">
 <link rel="stylesheet" href="/path/to/my.css" media="print" onload="this.media='all'">
 
-/*! 
-https://www.namehero.com/startup/how-to-inline-and-defer-css-on-wordpress-without-plugins/ 
-*/
-
 function hook_css() {
-?>
-<style>
-<!--INSERT GENERATED "ABOVE THE FOLD" CRITICAL PATH CSS-STRING HERE - EITHER IMMEDIATELY BELOW THIS LINE OR BY REPLACING THIS LINE WITH THE GENERATED STRING...!-->
-</style>
-<?php
+global $CSS_ATF_string;
+echo '<style>'.$CSS_ATF_string.'</style>';
 }
 add_action('wp_head', 'hook_css');
 /*! 
@@ -294,9 +256,6 @@ or:
 https://purifycss.online/
 */
 	
-/*! 
-https://www.namehero.com/startup/how-to-inline-and-defer-css-on-wordpress-without-plugins/ 
-*/
 
 /*! 
 Second Step: We now move all of the javascript (gathered and enqueued into handlers) down to the bottom of our HTML
@@ -314,12 +273,7 @@ add_action('wp_footer', 'wp_print_head_scripts', 5);
 }
 add_action( 'wp_enqueue_scripts', 'remove_head_scripts' );
 
-/*! END Custom Scripting to Move JavaScript
-https://speedrak.com/blog/how-to-move-javascripts-to-the-footer-in-wordpress/ 
-*/
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 /*! 
 Automatically create meta description from the_content 
 */
@@ -335,12 +289,7 @@ function create_meta_desc() {
 }
 add_action('wp_head', 'create_meta_desc');
 
-/*! 
-Source: http://wpsnipp.com/index.php/functions-php/automatically-create-meta-description-from-the_content/ 
-*/
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 /*!
 Minify HTML-code on the fly, removing line-breaks and white-spaces...
 */
@@ -472,38 +421,140 @@ add_action('get_header', 'flhm_wp_html_compression_start');
 */
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*add_action( 'wp_print_scripts', 'prefix_show_me_the_scripts' );
-/**
-* Show what Scripts and Styles are running on a page
-* Source: https://wpbeaches.com/show-all-loaded-scripts-and-styles-on-a-page-in-wordpress/
-*/
-/*
-function prefix_show_me_the_scripts() {
-	global $wp_scripts;
-	global $wp_styles;
-
-	echo 'SCRIPTS<br>';
-	foreach( $wp_scripts->queue as $handle ) :
-        echo $handle . ' <br> ';
-	endforeach;
-		
-	echo 'STYLES<br>';
-	foreach( $wp_styles->queue as $handle ) :
-	echo $handle . ' <br> ';
-	endforeach;	
-}
-*/
-
-/**
-The following is a code-example for unloading all styles found ("manually") by the code above from wpbeaches,
-as the stylesheet-selectors are already included further up under the function "hook_css"
 
 add_action('wp_print_styles', 'my_deregister_styles', 100);
 
 function my_deregister_styles() {
-wp_deregister_style('');
+wp_deregister_style('twenty-twenty-one-style');
+wp_deregister_style('twenty-twenty-one-print-style');
+wp_deregister_style('wp-block-library');
+wp_deregister_style('mihdan-lite-youtube-embed');
+wp_deregister_style('wp-dark-mode-frontend');
+wp_deregister_style('wp-block-library-theme');
+wp_deregister_style('global-styles');
+/*wp_deregister_style('nsc_bar_nice-cookie-consent');*/
+}
 
-/*repeat wp_deregister_style('stylename') as needed */
+function my_GA4_1_js() {
+global $GA4_string;
+echo '<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id='.$GA4_string.'"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag(\'js\', new Date());
+  gtag(\'config\', \''.$GA4_string.'\');
+</script>';}
+// Add hook for front-end <head></head>
+add_action( 'wp_head', 'my_GA4_1_js' );
+}
+
+
+/**
+add_action( 'wp_head', 'my_GTM_1_js' );
+function my_GTM_1_js(){
+global $GTM_string;
+echo '<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({\'gtm.start\':
+new Date().getTime(),event:\'gtm.js\'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!=\'dataLayer\'?\'&l=\'+l:\'\';j.async=true;j.src=
+\'https://www.googletagmanager.com/gtm.js?id=\'+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,\'script\',\'dataLayer\',\''.$GTM_string.'\');</script>
+<!-- End Google Tag Manager -->';
+// Add hook for front-end <head></head>
+}
+
+add_action('wp_body_open', 'add_code_on_body_open');
+function add_code_on_body_open() {
+global $GTM_string;
+    echo '<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id='.$GTM_string.'"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->';
+}
+*/
 
 }
+
+/*! 
+Sources:
+Remove Google Fonts:
+https://stackoverflow.com/questions/29134113/how-to-remove-or-dequeue-google-fonts-in-wordpress-twentyfifteen/45633445#45633445
+https://stackoverflow.com/users/839434/payter 
+
+
+Prevents WordPress from testing ssl capability on domain.com/xmlrpc.php?rsd #Speed-optimization: 
+https://wordpress.stackexchange.com/revisions/1769/5 
+
+ 
+Remove version info from head and feeds #Security/Hardening: 
+https://wordpress.stackexchange.com/questions/1567/best-collection-of-code-for-your-functions-php-file
+https://wordpress.stackexchange.com/users/472/derek-perkins 
+
+
+Remove unnecessary header info: 
+https://bhoover.com/remove-unnecessary-code-from-your-wordpress-blog-header/
+
+
+Disabling pingback and trackback notifications:
+https://wordpress.stackexchange.com/questions/190346/disabling-pingback-and-trackback-notifications 
+ 
+
+Disbable Self-Pingbacks:
+Source: Brian Jackson: "How To Speed-up wordpress" (PDF)- kinsta.com
+
+
+Remove extra CSS that the 'Recent Comments' widget injects:
+https://wordpress.stackexchange.com/revisions/3816/5 */
+(Orignally by: Andrew Ryno)
+
+
+Remove wp-version number params (scopes) from scripts and styles:
+https://artisansweb.net/remove-version-css-js-wordpress/ 
+
+ 
+Remove WPCF7-code, Google ReCaptcha-code and -badge everywhere sitewide, apart from the page(s) using contact-form-7: 
+https://wordpress.org/support/topic/recaptcha-v3-script-is-being-added-to-all-pages/#post-10983560
+
+
+Custom Scripting to Move CSS and JavaScript from the Head to the Footer:
+https://www.namehero.com/startup/how-to-inline-and-defer-css-on-wordpress-without-plugins/
+
+
+Moving all of the javascript (gathered and enqueued into handlers) down to the bottom of the HTML:
+(Use )
+https://speedrak.com/blog/how-to-move-javascripts-to-the-footer-in-wordpress/ 
+
+
+Automatically create meta description from the_content: 
+http://wpsnipp.com/index.php/functions-php/automatically-create-meta-description-from-the_content/ 
+  
+   
+Minify HTML-code on the fly, removing line-breaks and white-spaces...
+https://zuziko.com/tutorials/how-to-minify-html-in-wordpress-without-a-plugin/ by David Green (Note: EFFIN' BRILLIANT!!!) 
+
+
+Code used regarding JS-lib's et al:
+https://wordpress.stackexchange.com/questions/257317/update-jquery-version
+https://www.paulund.co.uk/dequeue-styles-and-scripts-in-wordpress
+
+The Instant.Page script by Alexandre Dieulot:
+https://instant.page/
+
+SRI-string adding and usage inspired by: 
+https://stackoverflow.com/questions/44827134/wordpress-script-with-integrity-and-crossorigin (See:cherryaustin's comment) 
+
+Google Analytics and Google Tag Manager Code:
+https://analytics.google.com/
+https://tagmanager.google.com/ 
+
+
+For development-purposes:
+https://wpbeaches.com/show-all-loaded-scripts-and-styles-on-a-page-in-wordpress/
+
+https://www.webperftools.com/blog/how-to-remove-unused-css-in-wordpress/
+
+All other code - forged together by Don W. Voorhies 
+
+(This plugin is made with recycled electrons - No bytes were harmed at any time!)
 */
