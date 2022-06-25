@@ -53,6 +53,7 @@ This plugin's collecton of code used herein is collected, "compiled" and assembl
 
 
 Changelog:
+
 1.0.5 : June 25th, 2022
 Google Analytics v.4.0 (GA4)-support and Google Tag Manager-support now implemented and activated also as an inserted varible-string (although Google Tag Manager is optional/commented out) 
 
