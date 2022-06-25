@@ -53,6 +53,14 @@ This plugin's collecton of code used herein is collected, "compiled" and assembl
 
 
 Changelog:
+1.0.5 : June 25th, 2022
+Google Analytics v.4.0 (GA4)-support and Google Tag Manager-support now implemented and activated also as an inserted varible-string (although Google Tag Manager is optional/commented out) 
+
+
+1.0.4 : June 25th, 2022
+Moved the "CSS Above The Fold" up in the code and the generated CSS is now inserted as a varible in the code 
+
+
 1.0.3 : May 15th, 2022  
 1. Missing "data-instant-intensity"-parameter with the value="viewport" added to activate the "instant.page"-script (Sorry, I forgot to add this initially!)
 2. Script to find loaded scripts and styles (Source: wpbeaches.com) added - commented out but can used to find which scripts and style are used - solely here for optimization-purposes
