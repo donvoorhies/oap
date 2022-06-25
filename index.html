@@ -12,7 +12,7 @@ body,html{height:100%;margin:0}body{font:16px Helvetica,Arial,Sans-Serif,Serif}m
 
 <body>
 <main>| 
-<header><h1>Don's Optimization Anthology Plugin (OAP) | v.1.0.3</h1></header>
+<header><h1>Don's Optimization Anthology Plugin (OAP) | v.1.0.5</h1></header>
 <article>
 <h2>About:</h2>
 <h3>"Don's Optimization Anthology Plugin" (abbrev.: OAP)</h3>
@@ -29,6 +29,8 @@ body,html{height:100%;margin:0}body{font:16px Helvetica,Arial,Sans-Serif,Serif}m
 <li>Removing verions + params (scopes) on URI's</li>
 <li>Deferring/async js-files</li>
 <li>Embedding "Above The Fold" Critical Path CSS, "defering" CSS-files and moving js from head to the footer</li>
+<li>NEW!: Google Analytics v.4.0 (GA4)-support and Google Tag Manager-support, too (although the latter is optional)
+</li>
 </ul>
 </article>
 
@@ -52,11 +54,8 @@ You can find the "Above The Fold" Critical Path CSS-string by using Jonas Sebast
 
 <a href="https://jonassebastianohlsson.com/criticalpathcssgenerator/" title="Critical Path CSS Generator" rel=”noreferrer” target="_blank">https://jonassebastianohlsson.com/criticalpathcssgenerator/</a>
 
-<p>Follow the instructions here, and copy and paste the generated string into the file (OAP_plugin.php; line 303 - or thereabouts) between the marked <code>"&lt;style&gt;&lt;/style&gt;"</code>-tags<br> 
-(look for these, along with the identifiying comment:</p> 
-<p><code>"/* INSERT GENERATED "ABOVE THE FOLD" CRITICAL PATH CSS-STRING HERE - EITHER UNDER THIS LINE OR BY REPLACING THIS LINE WITH THE GENERATED STRING...! */ "</code></p>
-<p>You can use your webhost's editor to perform this operation.</p>
-
+<p>Follow the instructions here, and copy and paste the generated string into the file (OAP_plugin.php; now on line 12(!) - or thereabouts); look for the following code-string, along with the identifiying comment:<br> $CSS_ATF_string='/(REMOVE THIS STRING BY PASTING THE GENERATED ABOVE-THE-FOLD CSS HERE IN BETWEEN THE APOSTROPHES)/'; you can use your webhost's editor to perform this operation.</p>
+  <p>Furthermore you'lle have to do similar for now in connenction by inserting the Google Analytics v.4 Measurement ID (as for the Google Tag Manager Workspace ID, too).</p>
 <h3>Planned/"Wish-list":</h3>
 
 <p>Future versions of this plugin might have implemented provisions to ease this process by inserting the generated "Above The Fold" Critical Path CSS-string via the admin-panel.</p>
