@@ -425,6 +425,11 @@ add_action('get_header', 'flhm_wp_html_compression_start');
 add_action('wp_print_styles', 'my_deregister_styles', 100);
 
 function my_deregister_styles() {
+/*
+Insert here the used style-handles in the "wp_deregister_style"-function as shown in the exaplle below; 
+use the script on this page for this:https://wpbeaches.com/show-all-loaded-scripts-and-styles-on-a-page-in-wordpress/
+
+EXAMPLE - only the visualization purposes abd help:
 wp_deregister_style('twenty-twenty-one-style');
 wp_deregister_style('twenty-twenty-one-print-style');
 wp_deregister_style('wp-block-library');
@@ -432,7 +437,7 @@ wp_deregister_style('mihdan-lite-youtube-embed');
 wp_deregister_style('wp-dark-mode-frontend');
 wp_deregister_style('wp-block-library-theme');
 wp_deregister_style('global-styles');
-/*wp_deregister_style('nsc_bar_nice-cookie-consent');*/
+*/
 }
 
 function my_GA4_1_js() {
