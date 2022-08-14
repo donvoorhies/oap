@@ -3,7 +3,7 @@
  * Plugin Name: Don's Optimization Anthology Plugin
  * Plugin URI: https://github.com/donvoorhies/oap
  * Description: An "anthology" of (IMO) some snazzy functions that I've come across over time, and which I earlier usually hardcoded into 'functions.php' to optimize my Wordpress-installs with; for more details regarding this plugin's different functionalites, as for accessing the latest updated version of this plugin - please go visit: https://github.com/donvoorhies/oap
- * Version (Installed): 1.0.5
+ * Version (Installed): 1.0.6
  * Author:  Various Contributors and sources | Compiled and assembled by Don W.Voorhies (See the referenced URLs regarding the specific contributing-credits)...
  * Author URI: https://donvoorhies.github.io/oap/
  * License: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (extended with additional conditions)
@@ -421,6 +421,18 @@ add_action('get_header', 'flhm_wp_html_compression_start');
 */
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*https://kinsta.com/blog/defer-parsing-of-javascript/#functions*/
+
+add_action('wp_print_styles', 'my_deregister_styles', 100);
+
+function defer_parsing_of_js( $url ) {
+    if ( is_user_logged_in() ) return $url; //don't break WP Admin
+    if ( FALSE === strpos( $url, '.js' ) ) return $url;
+    if ( strpos( $url, 'jquery.min.js' ) ) return $url;
+    return str_replace( ' src', ' defer src', $url );
+}
+add_filter( 'script_loader_tag', 'defer_parsing_of_js', 10 );	
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 add_action('wp_print_styles', 'my_deregister_styles', 100);
 
@@ -538,6 +550,8 @@ http://wpsnipp.com/index.php/functions-php/automatically-create-meta-description
 Minify HTML-code on the fly, removing line-breaks and white-spaces...
 https://zuziko.com/tutorials/how-to-minify-html-in-wordpress-without-a-plugin/ by David Green (Note: EFFIN' BRILLIANT!!!) 
 
+Defering of Javascript:
+https://kinsta.com/blog/defer-parsing-of-javascript/#functions
 
 Code used regarding JS-lib's et al:
 https://wordpress.stackexchange.com/questions/257317/update-jquery-version
