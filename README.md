@@ -54,6 +54,7 @@ This plugin's collecton of code used herein is collected, "compiled" and assembl
 
 Changelog:
 1.0.7 : November 5th, 2022
+
 Updated CDN-URLS and their respective SRI-hashes to updated jQuery-libraries and corrected a few minor typos in the comments 
 
 1.0.6 : August 14th, 2022
