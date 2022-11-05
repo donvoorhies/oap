@@ -3,7 +3,7 @@
  * Plugin Name: Don's Optimization Anthology Plugin
  * Plugin URI: https://github.com/donvoorhies/oap
  * Description: An "anthology" of (IMO) some snazzy functions that I've come across over time, and which I earlier usually hardcoded into 'functions.php' to optimize my Wordpress-installs with; for more details regarding this plugin's different functionalites, as for accessing the latest updated version of this plugin - please go visit: https://github.com/donvoorhies/oap
- * Version (Installed): 1.0.6
+ * Version (Installed): 1.0.7
  * Author:  Various Contributors and sources | Compiled and assembled by Don W.Voorhies (See the referenced URLs regarding the specific contributing-credits)...
  * Author URI: https://donvoorhies.github.io/oap/
  * License: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (extended with additional conditions)
@@ -192,8 +192,8 @@ wp_deregister_script('jquery-core');
 //wp_deregister_script('jquery-migrate');
 
 
-wp_register_script('jquery-core','https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js',array(),'3.6.0',true);
-wp_script_add_data('jquery-core', array( 'module','integrity','crossorigin' ) , array( 'sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==', 'anonymous' ) );
+wp_register_script('jquery-core','https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js',array(),'3.6.1',true);
+wp_script_add_data('jquery-core', array( 'module','integrity','crossorigin' ) , array( 'sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA==', 'anonymous' ) );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 /*! 
@@ -201,12 +201,12 @@ Although, jQuery-Migrate is no longer included/necessary from Wordpress v5.5, I 
 Uncomment and enqueue, if this should otherwise be the case...
 */ 
 /*
-wp_enqueue_script('jquery-migrate','"'https://cdnjs.cloudflare.com/ajax/libs/jquery-migrate/3.3.2/jquery-migrate.min.js',array(),'3.3.2',true);
-wp_script_add_data( 'jquery-migrate', array( 'module','integrity','crossorigin' ) , array( 'sha512-3fMsI1vtU2e/tVxZORSEeuMhXnT9By80xlmXlsOku7hNwZSHJjwcOBpmy+uu+fyWwGCLkMvdVbHkeoXdAzBv+w==', 'anonymous' ) );
+wp_enqueue_script('jquery-migrate','"'https://cdnjs.cloudflare.com/ajax/libs/jquery-migrate/3.4.0/jquery-migrate.min.js',array(),'3.4.0',true);
+wp_script_add_data( 'jquery-migrate', array( 'module','integrity','crossorigin' ) , array( 'sha512-QDsjSX1mStBIAnNXx31dyvw4wVdHjonOwrkaIhpiIlzqGUCdsI62MwQtHpJF+Npy2SmSlGSROoNWQCOFpqbsOg==', 'anonymous' ) );
 */
 
-wp_enqueue_script('instantpage','https://cdnjs.cloudflare.com/ajax/libs/instant.page/5.1.0/instantpage.min.js',array(),'5.1.0',true);
-wp_script_add_data( 'instantpage', array( 'module','integrity','crossorigin' ) , array( 'sha512-1+qUtKoh9XZW7j+6LhRMAyOrgSQKenQ4mluTR+cvxXjP1Z54RxZuzstR/H9kgPXQsVB8IW7DMDFUJpzLjvhGSQ==', 'anonymous' ));
+wp_enqueue_script('instantpage','https://cdnjs.cloudflare.com/ajax/libs/instant.page/5.1.1/instantpage.min.js',array(),'5.1.1',true);
+wp_script_add_data( 'instantpage', array( 'module','integrity','crossorigin' ) , array( 'sha512-caMAESeG5mlQ2CY/HMaLloKyz46yN2IlqBxXsoNOZusid57lNW6jRQeoR1JIC86YWwE1nEylOkc914tDHhUqWA==', 'anonymous' ));
 
 }
 }
@@ -243,6 +243,7 @@ Please read the author's (Bhagwad Park) interesting reasons for adding "rel=prel
 due to no default support; however, it looks like he's concatenated the following to the one line used above: 
 <link rel="preload" href="/path/to/my.css" as="style">
 <link rel="stylesheet" href="/path/to/my.css" media="print" onload="this.media='all'">
+*/
 
 function hook_css() {
 global $CSS_ATF_string;
@@ -421,7 +422,7 @@ add_action('get_header', 'flhm_wp_html_compression_start');
 */
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*https://kinsta.com/blog/defer-parsing-of-javascript/#functions*/
+/*! https://kinsta.com/blog/defer-parsing-of-javascript/#functions*/
 
 add_action('wp_print_styles', 'my_deregister_styles', 100);
 
@@ -437,11 +438,11 @@ add_filter( 'script_loader_tag', 'defer_parsing_of_js', 10 );
 add_action('wp_print_styles', 'my_deregister_styles', 100);
 
 function my_deregister_styles() {
-/*
+/*!
 Insert here the used style-handles in the "wp_deregister_style"-function as shown in the exaplle below; 
 use the script on this page for this:https://wpbeaches.com/show-all-loaded-scripts-and-styles-on-a-page-in-wordpress/
 
-EXAMPLE - only the visualization purposes abd help:
+EXAMPLE - only the visualization purposes and help:
 wp_deregister_style('twenty-twenty-one-style');
 wp_deregister_style('twenty-twenty-one-print-style');
 wp_deregister_style('wp-block-library');
