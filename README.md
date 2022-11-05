@@ -58,13 +58,16 @@ Changelog:
 Updated CDN-URLS and their respective SRI-hashes to updated jQuery-libraries and corrected a few minor typos in the comments 
 
 1.0.6 : August 14th, 2022
+
 Added code to defer loading of javascript 
 
 1.0.5 : June 25th, 2022
+
 Google Analytics v.4.0 (GA4)-support and Google Tag Manager-support now implemented and activated also as an inserted varible-string (although Google Tag Manager is optional/commented out) 
 
 
 1.0.4 : June 25th, 2022
+
 Moved the "CSS Above The Fold" up in the code and the generated CSS is now inserted as a varible in the code 
 
 
