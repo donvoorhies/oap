@@ -3,7 +3,7 @@
 
 An "anthology" of (IMO) some snazzy Wordpress function-codes that I've come across over time, which I (earlier) used to optimize Wordpress-installations with.
 
-The following functions this plugin quietly performs are (as of v.1.0.6, 08/14/2022):
+The following functions this plugin quietly performs are (as of v.1.0.6, 11/05/2022):
 - Pingbacks and Self-Pingbacks are disabled
 - Removed (unnecessary) code and -functions in the header (see the changelog for details)
 - Making the RECAPTCHA-function now run silently on the contact page (RECAPTCHA-logo now hidden)
@@ -53,6 +53,8 @@ This plugin's collecton of code used herein is collected, "compiled" and assembl
 
 
 Changelog:
+1.0.7 : November 5th, 2022
+Updated CDN-URLS and their respective SRI-hashes to updated jQuery-libraries and corrected a few minor typos in the comments 
 
 1.0.6 : August 14th, 2022
 Added code to defer loading of javascript 
