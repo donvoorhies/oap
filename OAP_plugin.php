@@ -1,15 +1,16 @@
 <?php
-/*!
- * Plugin Name: Don's Optimization Anthology Plugin
+/**
+ * @package OAP
+ */
+/**
+* Plugin Name: Don's Optimization Anthology Plugin
  * Plugin URI: https://github.com/donvoorhies/oap
  * Description: An "anthology" of (IMO) some snazzy functions that I've come across over time, and which I earlier usually hardcoded into 'functions.php' to optimize my Wordpress-installs with; for more details regarding this plugin's different functionalites, as for accessing the latest updated version of this plugin - please go visit: https://github.com/donvoorhies/oap
- * Version (Installed): 1.0.7
+ * Version (Installed): 1.0.8
  * Author:  Various Contributors and sources | Compiled and assembled by Don W.Voorhies (See the referenced URLs regarding the specific contributing-credits)...
  * Author URI: https://donvoorhies.github.io/oap/
  * License: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (extended with additional conditions)
  */
-
-$CSS_ATF_string='/*(REMOVE THIS STRING BY PASTING THE GENERATED ABOVE-THE-FOLD CSS HERE IN BETWEEN THE APOSTROPHES)*/';
 
 $GA4_string='/*(REMOVE THIS STRING BY PASTING GOOGLE ANALYTICS v.4 MEASUREMENT ID (NOTE: "MEASUREMENT ID"!) HERE IN BETWEEN THE APOSTROPHES)*/';
 
@@ -42,10 +43,10 @@ remove_filter('atom_service_url','atom_service_url_filter');
 /*! 
 Remove version info from head and feeds #Security/Hardening 
 */
+add_filter('the_generator', 'complete_version_removal');
 function complete_version_removal() {
     return '';
 }
-add_filter('the_generator', 'complete_version_removal');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -101,14 +102,15 @@ function wp_xmlrpc_methods( $methods ) { // Disable XML-RPC methods
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /* Disbable Self-Pingbacks*/
+add_action( 'pre_ping', 'wpsites_disable_self_pingbacks' );
 function wpsites_disable_self_pingbacks( &$links ) {
  foreach ( $links as $l => $link )
  if ( 0 === strpos( $link, get_option( 'home' ) ) )
  unset($links[$l]);
 }
-add_action( 'pre_ping', 'wpsites_disable_self_pingbacks' );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /*! 
 Remove extra CSS that the 'Recent Comments' widget injects
 */
@@ -126,13 +128,15 @@ $wp_widget_factory->widgets['WP_Widget_Recent_Comments'],
 This code-block has replaced the previous used, as it's been deemed more efficient/plays well with the rest of the code.
 Removes wp-version number params (scopes) from scripts and styles
 */
+	
+add_filter( 'style_loader_src', 'remove_css_js_version', 9999 );
+add_filter( 'script_loader_src', 'remove_css_js_version', 9999 );	
 function remove_css_js_version( $src ) {
     if( strpos( $src, '?ver=' ) )
         $src = remove_query_arg( 'ver', $src );
     return $src;
 }
-add_filter( 'style_loader_src', 'remove_css_js_version', 9999 );
-add_filter( 'script_loader_src', 'remove_css_js_version', 9999 );
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*!
@@ -140,7 +144,6 @@ Adds the "data-instant-intensity"-parameter with the value="viewport" to the bod
 */
 /*
 add_action("wp_footer", "your_theme_adding_extra_attributes"); 
-
 function your_theme_adding_extra_attributes(){
     ?>
     <script>
@@ -151,11 +154,12 @@ function your_theme_adding_extra_attributes(){
 */
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
 /*! 
 Remove WPCF7-code, Google ReCaptcha-code and -badge everywhere sitewide, apart from the page(s) using contact-form-7 
 If you're using another mail-form, then remove or comment out, and otherwise you're on your own 
 */
-
+add_action( 'wp_enqueue_scripts', 'contactform_dequeue_scripts', 99 );
 function contactform_dequeue_scripts() {
     $load_scripts = false;
     if( is_singular() ) {
@@ -171,7 +175,6 @@ function contactform_dequeue_scripts() {
         wp_dequeue_style('contact-form-7');		
     }
 }
-add_action( 'wp_enqueue_scripts', 'contactform_dequeue_scripts', 99 );
 /*! 
 NOTE:
 To find the handler-names, I used the code at: //https://cameronjonesweb.com.au/blog/how-to-find-out-the-handle-for-enqueued-wordpress-scripts/ 
@@ -186,14 +189,15 @@ The main intention here is as follows:
 
 3. Otherwise just add/queue-up your needed external jQuery-scripts - after the dotted line!
 */
+add_action('wp_enqueue_scripts','replace_add_core_jquery_version');
 function replace_add_core_jquery_version(){
 if	(!is_admin()){
 wp_deregister_script('jquery-core');
 //wp_deregister_script('jquery-migrate');
 
 
-wp_register_script('jquery-core','https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js',array(),'3.6.1',true);
-wp_script_add_data('jquery-core', array( 'module','integrity','crossorigin' ) , array( 'sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA==', 'anonymous' ) );
+wp_register_script('jquery-core','https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js',array(),'3.6.4',true);	
+wp_script_add_data('jquery-core', array( 'module','integrity','crossorigin' ) , array( 'sha512-pumBsjNRGGqkPzKHndZMaAG+bir374sORyzM3uulLV14lN5LyykqNk8eEeUlUkB3U0M4FApyaHraT65ihJhDpQ==', 'anonymous' ) );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 /*! 
@@ -204,13 +208,11 @@ Uncomment and enqueue, if this should otherwise be the case...
 wp_enqueue_script('jquery-migrate','"'https://cdnjs.cloudflare.com/ajax/libs/jquery-migrate/3.4.0/jquery-migrate.min.js',array(),'3.4.0',true);
 wp_script_add_data( 'jquery-migrate', array( 'module','integrity','crossorigin' ) , array( 'sha512-QDsjSX1mStBIAnNXx31dyvw4wVdHjonOwrkaIhpiIlzqGUCdsI62MwQtHpJF+Npy2SmSlGSROoNWQCOFpqbsOg==', 'anonymous' ) );
 */
-
-wp_enqueue_script('instantpage','https://cdnjs.cloudflare.com/ajax/libs/instant.page/5.1.1/instantpage.min.js',array(),'5.1.1',true);
-wp_script_add_data( 'instantpage', array( 'module','integrity','crossorigin' ) , array( 'sha512-caMAESeG5mlQ2CY/HMaLloKyz46yN2IlqBxXsoNOZusid57lNW6jRQeoR1JIC86YWwE1nEylOkc914tDHhUqWA==', 'anonymous' ));
-
+wp_enqueue_script('instantpage','https://cdnjs.cloudflare.com/ajax/libs/instant.page/5.2.0/instantpage.min.js',array(),'5.2.0',true);
+wp_script_add_data( 'instantpage', array( 'module','integrity','crossorigin' ) , array( 'sha512-p8l0Kir2Q2O+MWF/+qw2yM2LQQf0+m0AMD0EvGTFFL9vHquAXMRQKuyFBvHdTWpGEgIbXZxd9vjCRPUHeAhsOA==', 'anonymous' ));
 }
 }
-add_action('wp_enqueue_scripts','replace_add_core_jquery_version');
+
 
 /*!
 Regarding the wp_script_data: 
@@ -224,42 +226,8 @@ Use of SRI is recommended as a best-practice, whenever libraries are loaded from
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*! 
-Custom Scripting to Move CSS and JavaScript from the Head to the Footer
-First Step: We add and use here the “preload” attribute value to - in effect - defer our external stylesheets. 
-*/
-
-function add_rel_preload($html, $handle, $href, $media) {
-if (is_admin())
-return $html;
-$html = <<<EOT
-<link rel='preload' as='style' onload="this.onload=null;this.rel='stylesheet'" id='$handle' href='$href' type='text/css' media='all' />
-EOT;
-return $html;
-}
-add_filter( 'style_loader_tag', 'add_rel_preload', 10, 4 );
-
-/*! 
-Please read the author's (Bhagwad Park) interesting reasons for adding "rel=preload" - might not work completely on certain clents, 
-due to no default support; however, it looks like he's concatenated the following to the one line used above: 
-<link rel="preload" href="/path/to/my.css" as="style">
-<link rel="stylesheet" href="/path/to/my.css" media="print" onload="this.media='all'">
-*/
-
-function hook_css() {
-global $CSS_ATF_string;
-echo '<style>'.$CSS_ATF_string.'</style>';
-}
-add_action('wp_head', 'hook_css');
-/*! 
-Find the Critical Path CSS-selectors by using the online tool at either: 
-https://jonassebastianohlsson.com/criticalpathcssgenerator/
-or:
-https://purifycss.online/
-*/
-	
-
-/*! 
-Second Step: We now move all of the javascript (gathered and enqueued into handlers) down to the bottom of our HTML
+Custom Scripting to Move CSS and JavaScript from the Head to the Footer 
+Here we now move all of the javascript (gathered and enqueued into handlers) down to the bottom of our HTML
 */
 function remove_head_scripts() {
 remove_action('wp_head', 'wp_print_styles');	
@@ -411,11 +379,12 @@ function flhm_wp_html_compression_finish($html)
 {
 return new FLHM_HTML_Compression($html);
 }
+	
+add_action('get_header', 'flhm_wp_html_compression_start');
 function flhm_wp_html_compression_start()
 {
 ob_start('flhm_wp_html_compression_finish');
 }
-add_action('get_header', 'flhm_wp_html_compression_start');
 
 /*!
  https://zuziko.com/tutorials/how-to-minify-html-in-wordpress-without-a-plugin/ by David Green (Note: EFFIN' BRILLIANT!!!) 
@@ -423,36 +392,17 @@ add_action('get_header', 'flhm_wp_html_compression_start');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*! https://kinsta.com/blog/defer-parsing-of-javascript/#functions*/
-
-add_action('wp_print_styles', 'my_deregister_styles', 100);
-
+add_filter( 'script_loader_tag', 'defer_parsing_of_js', 10 );	
 function defer_parsing_of_js( $url ) {
     if ( is_user_logged_in() ) return $url; //don't break WP Admin
     if ( FALSE === strpos( $url, '.js' ) ) return $url;
     if ( strpos( $url, 'jquery.min.js' ) ) return $url;
     return str_replace( ' src', ' defer src', $url );
 }
-add_filter( 'script_loader_tag', 'defer_parsing_of_js', 10 );	
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-add_action('wp_print_styles', 'my_deregister_styles', 100);
-
-function my_deregister_styles() {
-/*!
-Insert here the used style-handles in the "wp_deregister_style"-function as shown in the exaplle below; 
-use the script on this page for this:https://wpbeaches.com/show-all-loaded-scripts-and-styles-on-a-page-in-wordpress/
-
-EXAMPLE - only the visualization purposes and help:
-wp_deregister_style('twenty-twenty-one-style');
-wp_deregister_style('twenty-twenty-one-print-style');
-wp_deregister_style('wp-block-library');
-wp_deregister_style('mihdan-lite-youtube-embed');
-wp_deregister_style('wp-dark-mode-frontend');
-wp_deregister_style('wp-block-library-theme');
-wp_deregister_style('global-styles');
-*/
-}
-
+add_action( 'wp_head', 'my_GA4_1_js' );	
 function my_GA4_1_js() {
 global $GA4_string;
 echo '<!-- Global site tag (gtag.js) - Google Analytics -->
@@ -464,7 +414,6 @@ echo '<!-- Global site tag (gtag.js) - Google Analytics -->
   gtag(\'config\', \''.$GA4_string.'\');
 </script>';}
 // Add hook for front-end <head></head>
-add_action( 'wp_head', 'my_GA4_1_js' );
 }
 
 
