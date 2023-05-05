@@ -12,7 +12,6 @@ The following functions, which this plugin quietly performs, are (as of v.1.0.8,
 - Adds SRI hashes and parameters on relevant URI’s (for obvious security reasons; if and where possible)
 - Removing versions + params (scopes) on URI's
 - Deferring/async js-files
-- Embedding "Above The Fold" Critical Path CSS, "defering" CSS-files and moving js from head to the footer
 - NEW!: Google Analytics v.4.0 (GA4)-support and Google Tag Manager-support, too (although the latter is optional)
 
 
