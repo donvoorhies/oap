@@ -30,16 +30,11 @@ Configuration:
 
 This plugin will work right out of the box - almost...
 
-For now, you're going to have get hold of the "Above The Fold" Critical Path CSS, and insert the generated string into the code in file, OAP_plugin.php.
-You can find the "Above The Fold" Critical Path CSS-string by using - for example -Jonas Sebastian Ohlsson's generator at: 
+For now, you'll have to insert the Google Analytics v.4 Measurement ID (as for the Google Tag Manager Workspace ID, too).
+i.e.: 
+$CSS_ATF_string='/*(REMOVE THIS STRING BY PASTING THE GA-4 ID HERE IN BETWEEN THE APOSTROPHES)*/';
+$GTM_string='/*(REMOVE THIS STRING BY PASTING THE GTM ID HERE IN BETWEEN THE APOSTROPHES)*/';
 
-https://jonassebastianohlsson.com/criticalpathcssgenerator/
-
-Follow the instructions here, and copy and paste the generated string into the file (OAP_plugin.php; now on line 12(!) - or thereabouts); look for the following code-string, along with the identifiying comment:
-$CSS_ATF_string='/*(REMOVE THIS STRING BY PASTING THE GENERATED ABOVE-THE-FOLD CSS HERE IN BETWEEN THE APOSTROPHES)*/';
-you can use your webhost's editor to perform this operation. 
-
-Furthermore you'lle have to do similar for now in connenction by inserting the Google Analytics v.4 Measurement ID (as for the Google Tag Manager Workspace ID, too).
 
 Planned/"Wish-list":
 
@@ -53,6 +48,11 @@ This plugin's collecton of code used herein is collected, "compiled" and assembl
 
 
 Changelog:
+1.0.8 : May 5th, 2023
+Remove all code pertaining to the CSS "Above The Fold" and the CSS-defering (for now)
+Updated CDN-URLS and their respective SRI-hashes to updated jQuery-libraries 
+Code cleaned up, refactored and (slightly) restructured
+
 1.0.7 : November 5th, 2022
 
 Updated CDN-URLS and their respective SRI-hashes to updated jQuery-libraries and corrected a few minor typos in the comments 
