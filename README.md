@@ -3,7 +3,7 @@
 
 An "anthology" of (IMO) some snazzy Wordpress function-codes that I've come across over time, which I (earlier) used to optimize Wordpress-installations with.
 
-The following functions, which this plugin quietly performs, are (as of v.1.0.7, 11/05/2022):
+The following functions, which this plugin quietly performs, are (as of v.1.0.8, 05/05/2023):
 - Pingbacks and Self-Pingbacks are disabled
 - Removed (unnecessary) code and -functions in the header (see the changelog for details)
 - Making the RECAPTCHA-function now run silently on the contact page (RECAPTCHA-logo now hidden)
