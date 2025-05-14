@@ -43,25 +43,16 @@ You can install this plugin via the WordPress admin panel.
 5. Activate from from the admin-panel
 
 Configuration:
+Go to “Settings > WP Speed Optimizer” for the configuration of the plugin and it's optional functionalities.
 
-This plugin will work right out of the box - almost...
+N.B.: Use a tool-page as https://w3speedup.com/tools/critical-css-generator/ (or similar) to generate the critical CSS to insert in the setting's field for this setting.
 
-For now, you'll have to insert the Google Analytics v.4 Measurement ID (as for the Google Tag Manager Workspace ID, too).
-i.e.: 
-$CSS_ATF_string='/*(REMOVE THIS STRING BY PASTING THE GA-4 ID HERE IN BETWEEN THE APOSTROPHES)*/';
-
-$GTM_string='/*(REMOVE THIS STRING BY PASTING THE GTM ID HERE IN BETWEEN THE APOSTROPHES)*/';
-
-
-Planned/"Wish-list":
-
-Future versions of this plugin might have implemented provisions to ease this process by inserting the generated "Above The Fold" Critical Path CSS-string via the admin-panel.
 
 Credits:
 
 This Wordpress-plugin is compiled and effectuated by various pieces of code that herald fom various sources/authors.
 These various sources are credited within this plugin's source-code, and must NOT be removed. 
-This plugin's collecton of code used herein is collected, "compiled" and assembled by this author.
+This plugin's collecton of code used herein is collected, "compiled" and assembled by this author (with some assistance from the "Autonomous Dev" - THANKS!).
 
 
 Changelog:
