@@ -20,16 +20,32 @@ body,html{height:100%;margin:0}body{font:16px Helvetica,Arial,Sans-Serif,Serif}m
 
 <p>The following functions, which this plugin quietly performs, are (as of v.1.0.8, 05/05/2023):</p>
 <ul>
-<li>Pingbacks and Self-Pingbacks are disabled</li>
-<li>Removed (unnecessary) code and -functions in the header (see the changelog for details)</li>
-<li>Making the RECAPTCHA-function now run silently on the contact page (RECAPTCHA-logo now hidden)</li>
-<li>Links (and is ready to use) the newest, commonly-used jQuery-lib(s) (in Wordpress) from a CDN (currently cdnjs.com)</li>
-<li>Adds Alexandre Dieulot’s fascinating “instant.page”-functionality</li>
-<li>Adds SRI hashes and parameters on relevant URI’s (for obvious security reasons; if and where possible)</li>
-<li>Removing verions + params (scopes) on URI's</li>
-<li>Deferring/async js-files</li>
-<li>NEW!: Google Analytics v.4.0 (GA4)-support and Google Tag Manager-support, too (although the latter is optional)
-</li>
+<li>Removes emoji scripts/styles</li>
+<li>Disables embeds</li>
+<li>Strips query strings from static resources</li>
+<li>Removes WordPress version from head</li>
+<li>Inlines above-the-fold critical CSS (filter: wpso_critical_css)</li>
+<li>Defers non-essential JS for faster first paint</li>
+<li>Removes wp-version number params from scripts and styles</li>
+<li>Removes Google Fonts (for most themes/plugins)</li>
+<li>Prevents SSL test on xmlrpc.php</li>
+<li>Removes version info from feeds</li>
+<li>Removes unnecessary header info (RSD, wlwmanifest, shortlink, REST, feeds, adjacent posts)</li>
+<li>Disables pingback and trackback notifications</li>
+<li>Disables self-pingbacks</li>
+<li>Removes extra CSS from Recent Comments widget</li>
+<li>Minifies CSS & JS (production-grade)</li>
+<li>Combines CSS & JS (production-grade)</li>
+<li>Adds for user-specified origins</li>
+<li>Adds for user-specified assets</li>
+<li>Heartbeat API control (normal/throttle/disable)</li>
+<li>Minimalist settings page for toggling features</li>
+<li>Global and per-page critical CSS UI</li>
+<li>Auto-generates critical CSS using Node.js 'critical' if available (prototype/experimental)</li>
+<li>Optionally moves all CSS files to the footer (experimental, may cause FOUC)</li>
+<li>Optionally minifies HTML output (experimental)</li>
+<li>Toggle to allow or block Google Fonts for privacy & speed</li>
+<li>Optionally moves all JavaScript files to the footer (experimental, may break some plugins/themes)</li>
 </ul>
 </article>
 
@@ -47,21 +63,31 @@ body,html{height:100%;margin:0}body{font:16px Helvetica,Arial,Sans-Serif,Serif}m
   
 <article>
 <h2>Configuration:</h2>
-<p>The plugin will work right out of the box - <strong>almost</strong>...<br>
-<p>For now, you'll have to insert the Google Analytics v.4 Measurement ID (as for the Google Tag Manager Workspace ID, too).<br /> 
-i.e.:<br /> 
-$CSS_ATF_string='/(REMOVE THIS STRING BY PASTING THE GA-4 ID HERE IN BETWEEN THE APOSTROPHES)/';<br />
-$GTM_string='/(REMOVE THIS STRING BY PASTING THE GTM ID HERE IN BETWEEN THE APOSTROPHES)/';</p>
+<p>Configuration:<br> 
+Go to “Settings &gt; WP Speed Optimizer” for the configuration of the plugin and it's optional functionalities.<br>
+N.B.: Use a tool-page as <a href="https://w3speedup.com/tools/critical-css-generator/" target="_blank">https://w3speedup.com/tools/critical-css-generator/</a> (or similar) to generate the critical CSS to insert in the setting's field for this setting.</p>
 <h3>Planned/"Wish-list":</h3>
 
 <p>Future versions of this plugin might have implemented provisions to ease this process by inserting the generated "Above The Fold" Critical Path CSS-string via the admin-panel.</p>
 </article>
 <article>
 <h2>Credits:</h2>
-<p>This Wordpress-plugin is compiled and effectuated by various pieces of code that herald fom various sources/authors. These various sources are credited within this plugin's source-code, and must NOT be removed. This plugin's collecton of code used herein is collected, "compiled" and assembled by this author.</p>
+<p>This Wordpress-plugin is compiled and effectuated by various pieces of code that herald fom various sources/authors. These various sources are credited within this plugin's source-code, and must NOT be removed. This plugin's collecton of code used herein is collected, "compiled" and assembled by this author (with some assistance from the "Autonomous Dev" - THANKS!).</p>
 </article>
 <article>
 <h2>Changelog:</h2>
+<p>2.0.0 : May 14th, 2025</p>
+<ul>
+<li>Critical CSS UI (global) & Above-the-fold optimization: critical CSS inlining and JS defer - both reinstated</li>
+<li>User-requested: Google Fonts removal, SSL test prevention, feed version removal, header cleanup, pingback/trackback/self-pingback disabling, Recent Comments CSS removal, and version param cleanup</li>
+<li>Minify/combine CSS & JS, preconnect, preload, Heartbeat API control, and settings page (all prototype)</li>
+<li>Production-grade minify/combine</li>
+<li>and auto-generation via Node.js 'critical' (prototype/experimental)</li>
+<li>Added experimental option to move CSS files from header to footer</li>
+<li>Added HTML minification (removes whitespace and line-breaks)</li>
+<li>Added toggle to allow or block Google Fonts</li>
+<li>Added option to move JavaScript files from header to footer</li>
+</ul>
 <p>1.0.8 : May 5th, 2023<br>
 <ul>
 <li>Removed all code pertaining to the CSS "Above The Fold" and the CSS-defering (for now)</li>
