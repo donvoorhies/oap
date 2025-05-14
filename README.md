@@ -75,6 +75,7 @@ Changelog:
 * Added toggle to allow or block Google Fonts 
 
 * Added option to move JavaScript files from header to footer 
+
 1.0.8 : May 5th, 2023
 - Removed all code pertaining to the CSS "Above The Fold" and the CSS-defering (for now)
 - Updated CDN-URLS and their respective SRI-hashes to updated jQuery-libraries 
