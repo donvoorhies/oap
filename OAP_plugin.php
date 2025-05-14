@@ -6,445 +6,550 @@
 * Plugin Name: Don's Optimization Anthology Plugin
  * Plugin URI: https://github.com/donvoorhies/oap
  * Description: An "anthology" of (IMO) some snazzy functions that I've come across over time, and which I earlier usually hardcoded into 'functions.php' to optimize my Wordpress-installs with; for more details regarding this plugin's different functionalites, as for accessing the latest updated version of this plugin - please go visit: https://github.com/donvoorhies/oap
- * Version (Installed): 1.0.8
- * Author:  Various Contributors and sources | Compiled and assembled by Don W.Voorhies (See the referenced URLs regarding the specific contributing-credits)...
+ * Version (Installed): 2.0.0
+ * Author:  Various Contributors and sources | Compiled and assembled by Don W.Voorhies (See the referenced URLs regarding the specific contributing-credits) - assisted by the Autonomous DEV...
  * Author URI: https://donvoorhies.github.io/oap/
  * License: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (extended with additional conditions)
  */
 
-$GA4_string='/*(REMOVE THIS STRING BY PASTING GOOGLE ANALYTICS v.4 MEASUREMENT ID (NOTE: "MEASUREMENT ID"!) HERE IN BETWEEN THE APOSTROPHES)*/';
-
-$GTM_string='/*(REMOVE THIS STRING BY PASTING GOOGLE TAG MANAGER WORKSPACE ID HERE IN BETWEEN THE APOSTROPHES)*/';
-
-if(!is_admin()){
-/*! Quick-fix by encapsulating all of the functions in a conditional statement so the back-end content-editing functionalites won't get crippled (as a seen as a "white-page-of-death" as experienced after the Wordpress 6.0-update), when running the admin side code (i.e.: back-end); the switching off here of this plugin ONLY effects the back-end!
-*/
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/*! 
-Remove Google Fonts 
-(If you want to use Google Fonts and/or your theme breaks, either comment out - or completely remove - the following block of code)
-*/
-add_filter( 'style_loader_src', function($href){
-if(strpos($href, "//fonts.googleapis.com/") === false) {
-return $href;
+// If this file is called directly, abort.
+if (!defined('WPINC')) {
+    die;
 }
-return false;
+
+// --- Core Optimization Hooks --- //
+
+// Remove emoji scripts/styles
+add_action('init', function() {
+    remove_action('wp_head', 'print_emoji_detection_script', 7);
+    remove_action('wp_print_styles', 'print_emoji_styles');
 });
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Disable embeds
+add_action('init', function() {
+    remove_action('rest_api_init', 'wp_oembed_register_route');
+    remove_filter('oembed_dataparse', 'wp_filter_oembed_result', 10);
+    remove_action('wp_head', 'wp_oembed_add_discovery_links');
+    remove_action('wp_head', 'wp_oembed_add_host_js');
+});
 
-/*! 
-Prevents WordPress from testing ssl capability on domain.com/xmlrpc.php?rsd #Speed-optimization 
-*/
-remove_filter('atom_service_url','atom_service_url_filter');
+// Remove query strings from static resources
+add_filter('script_loader_src', function($src) {
+    $parts = explode('?', $src);
+    return $parts[0];
+}, 15);
+add_filter('style_loader_src', function($src) {
+    $parts = explode('?', $src);
+    return $parts[0];
+}, 15);
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*! 
-Remove version info from head and feeds #Security/Hardening 
-*/
-add_filter('the_generator', 'complete_version_removal');
-function complete_version_removal() {
-    return '';
-}
+// Remove WordPress version from head
+remove_action('wp_head', 'wp_generator');
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// --- End of prototype --- // 
 
-/*! 
-Remove unnecessary header info 
-*/
+// --- Above-the-fold Optimization (prototype) --- //
 
-add_action( 'init', 'remove_header_info' );
-function remove_header_info() {
-remove_action( 'wp_head', 'rsd_link' );
-remove_action( 'wp_head', 'wlwmanifest_link' );
-remove_action( 'wp_head', 'wp_generator' );
-remove_action( 'wp_head', 'start_post_rel_link' );
-remove_action( 'wp_head', 'index_rel_link' );
-remove_action( 'wp_head', 'wp_shortlink_wp_head');
-//remove_action( 'wp_head', 'adjacent_posts_rel_link' );         // for WordPress < 3.0
-remove_action( 'wp_head', 'adjacent_posts_rel_link_wp_head' ); // for WordPress >= 3.0
-}
+// 1. Inline critical CSS for above-the-fold content
+add_action('wp_head', function() {
+    // Users can filter 'wpso_critical_css' to inject their own critical CSS
+    $critical_css = apply_filters('wpso_critical_css', '/* Add your critical CSS here! */');
+    if ($critical_css) {
+        echo "<style id='wpso-critical-css'>" . $critical_css . "</style>\n";
+    }
+}, 1); // Priority 1: very early in <head>
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 2. Defer non-essential JS (except jQuery/core)
+add_filter('script_loader_tag', function($tag, $handle) {
+    $skip = [
+        'jquery', 'jquery-core', 'jquery-migrate', 'wp-polyfill', 'wp-hooks', 'wp-i18n',
+        // Add more handles here if needed
+    ];
+    if (in_array($handle, $skip)) return $tag;
+    // Only add defer if not already present and is a JS file
+    if (strpos($tag, ' defer') === false && strpos($tag, '<script') !== false) {
+        $tag = str_replace('<script ', '<script defer ', $tag);
+    }
+    return $tag;
+}, 10, 2);
 
-/**
-Disabling pingback and trackback notifications
-*/
+// --- End above-the-fold optimization prototype --- // 
 
-add_action( 'pre_ping', 'wp_internal_pingbacks' );
-add_filter( 'wp_headers', 'wp_x_pingback');
-add_filter( 'bloginfo_url', 'wp_pingback_url') ;
-add_filter( 'bloginfo', 'wp_pingback_url') ;
-add_filter( 'xmlrpc_enabled', '__return_false' );
-add_filter( 'xmlrpc_methods', 'wp_xmlrpc_methods' );
+// --- User-requested Speed & Security Optimizations (prototype) --- //
 
-function wp_internal_pingbacks( &$links ) { // Disable internal pingbacks
-    foreach ( $links as $l => $link ) {
-        if ( 0 === strpos( $link, get_option( 'home' ) ) ) {
-            unset( $links[$l] );
+// 1. Remove Google Fonts (for most themes/plugins)
+add_action('wp_enqueue_scripts', function() {
+    $opts = get_option('wpso_options');
+    if (!empty($opts['allow_google_fonts'])) return; // Allow if checked
+    global $wp_styles, $wp_scripts;
+    foreach ($wp_styles->registered as $handle => $style) {
+        if (isset($style->src) && strpos($style->src, 'fonts.googleapis.com') !== false) {
+            wp_dequeue_style($handle);
+            wp_deregister_style($handle);
         }
     }
-}
-function wp_x_pingback( $headers ) { // Disable x-pingback
-    unset( $headers['X-Pingback'] );
-    return $headers;
-}
-function wp_pingback_url( $output, $show='') { // Remove pingback URLs
-    if ( $show == 'pingback_url' ) $output = '';
-    return $output;
-}
-function wp_xmlrpc_methods( $methods ) { // Disable XML-RPC methods
-    unset( $methods['pingback.ping'] );
+    foreach ($wp_scripts->registered as $handle => $script) {
+        if (isset($script->src) && strpos($script->src, 'fonts.googleapis.com') !== false) {
+            wp_dequeue_script($handle);
+            wp_deregister_script($handle);
+        }
+    }
+}, 100);
+
+// 2. Prevent WordPress from testing SSL capability on xmlrpc.php?rsd
+add_filter('site_status_tests', function($tests) {
+    if (isset($tests['direct']['ssl_support'])) {
+        unset($tests['direct']['ssl_support']);
+    }
+    return $tests;
+});
+
+// 3. Remove version info from head and feeds (already in head, now for feeds)
+add_filter('the_generator', '__return_empty_string');
+
+// 4. Remove unnecessary header info
+remove_action('wp_head', 'rsd_link'); // Really Simple Discovery
+remove_action('wp_head', 'wlwmanifest_link'); // Windows Live Writer
+remove_action('wp_head', 'wp_shortlink_wp_head'); // Shortlink
+remove_action('wp_head', 'rest_output_link_wp_head'); // REST API link
+remove_action('wp_head', 'feed_links_extra', 3); // Extra feed links
+remove_action('wp_head', 'feed_links', 2); // Main feed links
+remove_action('wp_head', 'adjacent_posts_rel_link_wp_head', 10); // Prev/next post links
+
+// 5. Disable pingback and trackback notifications
+add_filter('xmlrpc_methods', function($methods) {
+    unset($methods['pingback.ping'], $methods['pingback.extensions.getPingbacks']);
     return $methods;
+});
+add_filter('wp_headers', function($headers) {
+    unset($headers['X-Pingback']);
+    return $headers;
+});
+add_action('pre_ping', function(&$links) {
+    $links = array();
+});
+
+// 6. Disable self-pingbacks
+add_action('pre_ping', function(&$links) {
+    foreach ($links as $l => $link) {
+        if (0 === strpos($link, get_option('home'))) {
+            unset($links[$l]);
+        }
+    }
+});
+
+// 7. Remove extra CSS from Recent Comments widget
+add_action('widgets_init', function() {
+    global $wp_widget_factory;
+    if (isset($wp_widget_factory->widgets['WP_Widget_Recent_Comments'])) {
+        remove_action('wp_head', array($wp_widget_factory->widgets['WP_Widget_Recent_Comments'], 'recent_comments_style'));
+    }
+});
+
+// 8. Remove wp-version number params from scripts and styles (scoped)
+add_filter('script_loader_src', function($src) {
+    $src = remove_query_arg('ver', $src);
+    return $src;
+}, 9999);
+add_filter('style_loader_src', function($src) {
+    $src = remove_query_arg('ver', $src);
+    return $src;
+}, 9999);
+
+// --- End user-requested optimizations prototype --- // 
+
+// --- Settings Page & Options Scaffold (prototype) --- //
+
+add_action('admin_menu', function() {
+    add_options_page(
+        'WP Speed Optimizer',
+        'WP Speed Optimizer',
+        'manage_options',
+        'wpso-settings',
+        'wpso_render_settings_page'
+    );
+});
+
+add_action('admin_init', function() {
+    register_setting('wpso_settings', 'wpso_options');
+    add_settings_section('wpso_main', 'Speedy Settings', null, 'wpso-settings');
+    // Add fields for each feature
+    add_settings_field('minify', 'Minify CSS & JS', 'wpso_field_minify', 'wpso-settings', 'wpso_main');
+    add_settings_field('combine', 'Combine CSS & JS', 'wpso_field_combine', 'wpso-settings', 'wpso_main');
+    add_settings_field('preconnect', 'Preconnect Origins', 'wpso_field_preconnect', 'wpso-settings', 'wpso_main');
+    add_settings_field('preload', 'Preload Critical Assets', 'wpso_field_preload', 'wpso-settings', 'wpso_main');
+    add_settings_field('heartbeat', 'Control Heartbeat API', 'wpso_field_heartbeat', 'wpso-settings', 'wpso_main');
+    add_settings_field('perpage', 'Disable Assets Per Page', 'wpso_field_perpage', 'wpso-settings', 'wpso_main');
+    add_settings_field('critical_css', 'Global Critical CSS', 'wpso_field_critical_css', 'wpso-settings', 'wpso_main');
+    add_settings_field('move_css_footer', 'Move CSS to Footer', 'wpso_field_move_css_footer', 'wpso-settings', 'wpso_main');
+    add_settings_field('minify_html', 'Minify HTML Output', 'wpso_field_minify_html', 'wpso-settings', 'wpso_main');
+    add_settings_field('allow_google_fonts', 'Allow Google Fonts', 'wpso_field_allow_google_fonts', 'wpso-settings', 'wpso_main');
+    add_settings_field('move_js_footer', 'Move JavaScript to Footer', 'wpso_field_move_js_footer', 'wpso-settings', 'wpso_main');
+});
+
+function wpso_render_settings_page() {
+    echo '<div class="wrap"><h1>WP Speed Optimizer // prototype</h1>';
+    echo '<form method="post" action="options.php">';
+    settings_fields('wpso_settings');
+    // List detected Google Fonts
+    $google_fonts = wpso_detect_google_fonts();
+    if (!empty($google_fonts)) {
+        echo '<div style="background:#fffbe5;border:1px solid #ffe066;padding:10px;margin-bottom:15px;">';
+        echo '<strong>Detected Google Fonts:</strong><ul style="margin:0 0 0 20px;">';
+        foreach ($google_fonts as $font) {
+            echo '<li>' . esc_html($font['handle']) . ' <span style="color:#888">(' . esc_html($font['type']) . ')</span> &rarr; <code>' . esc_html($font['src']) . '</code></li>';
+        }
+        echo '</ul></div>';
+    } else {
+        echo '<div style="background:#eaffea;border:1px solid #b2f2bb;padding:10px;margin-bottom:15px;">No Google Fonts detected in registered styles/scripts.</div>';
+    }
+    echo '<p>Toggle and configure speed optimizations. <em>Most features are production-grade, but some are still marked as prototype.</em></p>';
+    echo '<h2>Global Optimizations</h2>';
+    do_settings_sections('wpso-settings');
+    submit_button();
+    echo '</form></div>';
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/* Disbable Self-Pingbacks*/
-add_action( 'pre_ping', 'wpsites_disable_self_pingbacks' );
-function wpsites_disable_self_pingbacks( &$links ) {
- foreach ( $links as $l => $link )
- if ( 0 === strpos( $link, get_option( 'home' ) ) )
- unset($links[$l]);
+// --- Field Renderers (minimal, playful) --- //
+function wpso_field_minify() {
+    $opts = get_option('wpso_options');
+    echo '<input type="checkbox" name="wpso_options[minify]" value="1" '.checked(1, $opts['minify'] ?? 0, false).' /> Minify all CSS & JS (prototype)';
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/*! 
-Remove extra CSS that the 'Recent Comments' widget injects
-*/
-add_action( 'widgets_init', 'remove_recent_comments_style' );
-function remove_recent_comments_style() {
-global $wp_widget_factory;
-remove_action( 'wp_head', array(
-$wp_widget_factory->widgets['WP_Widget_Recent_Comments'],
-'recent_comments_style'
-));
+function wpso_field_combine() {
+    $opts = get_option('wpso_options');
+    echo '<input type="checkbox" name="wpso_options[combine]" value="1" '.checked(1, $opts['combine'] ?? 0, false).' /> Combine all CSS & JS (prototype)';
 }
+function wpso_field_preconnect() {
+    $opts = get_option('wpso_options');
+    echo '<input type="text" name="wpso_options[preconnect]" value="'.esc_attr($opts['preconnect'] ?? '').'" size="50" placeholder="e.g. https://fonts.gstatic.com, https://cdn.example.com" />';
+}
+function wpso_field_preload() {
+    $opts = get_option('wpso_options');
+    echo '<input type="text" name="wpso_options[preload]" value="'.esc_attr($opts['preload'] ?? '').'" size="50" placeholder="e.g. /wp-content/themes/yourtheme/hero.jpg, /wp-content/plugins/plugin/font.woff2" />';
+}
+function wpso_field_heartbeat() {
+    $opts = get_option('wpso_options');
+    echo '<select name="wpso_options[heartbeat]">';
+    echo '<option value="normal" '.selected($opts['heartbeat'] ?? '', 'normal', false).'>Normal</option>';
+    echo '<option value="throttle" '.selected($opts['heartbeat'] ?? '', 'throttle', false).'>Throttle</option>';
+    echo '<option value="disable" '.selected($opts['heartbeat'] ?? '', 'disable', false).'>Disable</option>';
+    echo '</select> (prototype)';
+}
+function wpso_field_perpage() {
+    echo '<em>Coming soon: UI for per-page asset disabling!</em>';
+}
+function wpso_field_critical_css() {
+    $opts = get_option('wpso_options');
+    echo '<textarea name="wpso_options[critical_css]" rows="6" cols="60" placeholder="Paste your above-the-fold CSS here">'.esc_textarea($opts['critical_css'] ?? '').'</textarea>';
+    echo '<br><small>This CSS will be inlined on all pages unless a per-page override is set.</small>';
+}
+function wpso_field_move_css_footer() {
+    $opts = get_option('wpso_options');
+    echo '<input type="checkbox" name="wpso_options[move_css_footer]" value="1" '.checked(1, $opts['move_css_footer'] ?? 0, false).' /> Move all CSS files to the footer (experimental, may cause FOUC)';
+}
+function wpso_field_minify_html() {
+    $opts = get_option('wpso_options');
+    echo '<input type="checkbox" name="wpso_options[minify_html]" value="1" '.checked(1, $opts['minify_html'] ?? 0, false).' /> Minify HTML output (removes whitespace and line-breaks, experimental)';
+}
+function wpso_field_allow_google_fonts() {
+    $opts = get_option('wpso_options');
+    echo '<input type="checkbox" name="wpso_options[allow_google_fonts]" value="1" '.checked(1, $opts['allow_google_fonts'] ?? 0, false).' /> Allow Google Fonts (uncheck to block/remove for privacy & speed)';
+}
+function wpso_field_move_js_footer() {
+    $opts = get_option('wpso_options');
+    echo '<input type="checkbox" name="wpso_options[move_js_footer]" value="1" '.checked(1, $opts['move_js_footer'] ?? 0, false).' /> Move all JavaScript files to the footer (experimental, may break some plugins/themes)';
+}
+// --- End settings page scaffold --- //
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*! 
-This code-block has replaced the previous used, as it's been deemed more efficient/plays well with the rest of the code.
-Removes wp-version number params (scopes) from scripts and styles
-*/
-	
-add_filter( 'style_loader_src', 'remove_css_js_version', 9999 );
-add_filter( 'script_loader_src', 'remove_css_js_version', 9999 );	
-function remove_css_js_version( $src ) {
-    if( strpos( $src, '?ver=' ) )
-        $src = remove_query_arg( 'ver', $src );
+// --- Improved Minify & Combine CSS/JS (production-grade) --- //
+add_action('wp_enqueue_scripts', function() {
+    $opts = get_option('wpso_options');
+    if (!is_admin() && (!empty($opts['minify']) || !empty($opts['combine']))) {
+        global $wp_styles, $wp_scripts;
+        static $done = false;
+        if ($done) return; // Prevent double run
+        $done = true;
+        // --- Combine CSS --- //
+        if (!empty($opts['combine'])) {
+            $css = '';
+            $seen = [];
+            foreach ($wp_styles->queue as $handle) {
+                $src = $wp_styles->registered[$handle]->src ?? '';
+                if ($src && strpos($src, '.css') !== false) {
+                    $src = wpso_resolve_url($src);
+                    if ($src && !isset($seen[$src])) {
+                        $css .= @file_get_contents($src);
+                        $seen[$src] = true;
+                    }
+                    wp_dequeue_style($handle);
+                }
+            }
+            if ($css) {
+                if (!empty($opts['minify'])) $css = wpso_minify_css($css);
+                add_action('wp_head', function() use ($css) {
+                    echo '<style id="wpso-combined-css">'.$css.'</style><!-- combined // production -->';
+                }, 99);
+            }
+        } elseif (!empty($opts['minify'])) {
+            // Minify each enqueued CSS
+            foreach ($wp_styles->queue as $handle) {
+                $src = $wp_styles->registered[$handle]->src ?? '';
+                if ($src && strpos($src, '.css') !== false) {
+                    $src = wpso_resolve_url($src);
+                    if ($src) {
+                        $css = @file_get_contents($src);
+                        $css = wpso_minify_css($css);
+                        add_action('wp_head', function() use ($css, $handle) {
+                            echo '<style id="wpso-minified-css-'.$handle.'">'.$css.'</style><!-- minified // production -->';
+                        }, 99);
+                        wp_dequeue_style($handle);
+                    }
+                }
+            }
+        }
+        // --- Combine JS --- //
+        if (!empty($opts['combine'])) {
+            $js = '';
+            $seen = [];
+            foreach ($wp_scripts->queue as $handle) {
+                $src = $wp_scripts->registered[$handle]->src ?? '';
+                if ($src && strpos($src, '.js') !== false) {
+                    $src = wpso_resolve_url($src);
+                    if ($src && !isset($seen[$src])) {
+                        $js .= @file_get_contents($src)."\n";
+                        $seen[$src] = true;
+                    }
+                    wp_dequeue_script($handle);
+                }
+            }
+            if ($js) {
+                if (!empty($opts['minify'])) $js = wpso_minify_js($js);
+                add_action('wp_footer', function() use ($js) {
+                    echo '<script id="wpso-combined-js">'.$js.'</script><!-- combined // production -->';
+                }, 99);
+            }
+        } elseif (!empty($opts['minify'])) {
+            // Minify each enqueued JS
+            foreach ($wp_scripts->queue as $handle) {
+                $src = $wp_scripts->registered[$handle]->src ?? '';
+                if ($src && strpos($src, '.js') !== false) {
+                    $src = wpso_resolve_url($src);
+                    if ($src) {
+                        $js = @file_get_contents($src);
+                        $js = wpso_minify_js($js);
+                        add_action('wp_footer', function() use ($js, $handle) {
+                            echo '<script id="wpso-minified-js-'.$handle.'">'.$js.'</script><!-- minified // production -->';
+                        }, 99);
+                        wp_dequeue_script($handle);
+                    }
+                }
+            }
+        }
+    }
+}, 999);
+
+// --- Helper: Resolve relative URLs to absolute file paths (production-grade) --- //
+function wpso_resolve_url($src) {
+    if (strpos($src, '//') === 0) $src = 'https:' . $src;
+    if (strpos($src, 'http') === 0) {
+        // Try to convert to local path if possible
+        $home_url = home_url();
+        $site_url = site_url();
+        $content_url = content_url();
+        $abs_path = ABSPATH;
+        if (strpos($src, $content_url) === 0) {
+            $rel = substr($src, strlen($content_url));
+            $file = WP_CONTENT_DIR . $rel;
+            if (file_exists($file)) return $file;
+        }
+        // Fallback: try to fetch remote (not ideal for production)
+        return $src;
+    }
+    // Already a file path
     return $src;
 }
 
+// --- Simple Minifiers (prototype) --- //
+function wpso_minify_css($css) {
+    $css = preg_replace('!\s+!', ' ', $css);
+    $css = preg_replace('/\s*([{}|:;,])\s+/', '$1', $css);
+    $css = preg_replace('/;}/', '}', $css);
+    $css = preg_replace('/\/\*.*?\*\//', '', $css);
+    return trim($css);
+}
+function wpso_minify_js($js) {
+    $js = preg_replace('/\/\*.*?\*\//s', '', $js); // Remove comments
+    $js = preg_replace('/\s+/', ' ', $js);
+    return trim($js);
+}
+// --- End minify/combine prototype --- //
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*!
-Adds the "data-instant-intensity"-parameter with the value="viewport" to the body-tag; used in connction with the Instant.Page-script by Alexandre Dieulot - TO BE ONLY ACTIVATED IF PAGES WITH A QUERY STRING (a “?”) IN THEIR URL ARE USED 
-*/
-/*
-add_action("wp_footer", "your_theme_adding_extra_attributes"); 
-function your_theme_adding_extra_attributes(){
-    ?>
-    <script>
-        let body = document.getElementsByTagName("body");
-        body[0].setAttribute("data-instant-intensity", "viewport"); 
-</script>
-<?php }
-*/
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
-/*! 
-Remove WPCF7-code, Google ReCaptcha-code and -badge everywhere sitewide, apart from the page(s) using contact-form-7 
-If you're using another mail-form, then remove or comment out, and otherwise you're on your own 
-*/
-add_action( 'wp_enqueue_scripts', 'contactform_dequeue_scripts', 99 );
-function contactform_dequeue_scripts() {
-    $load_scripts = false;
-    if( is_singular() ) {
-    	$post = get_post();
-    	if( has_shortcode($post->post_content, 'contact-form-7') ) {
-        	$load_scripts = true;			
-		}
+// --- Preconnect & Preload (prototype) --- //
+add_action('wp_head', function() {
+    $opts = get_option('wpso_options');
+    // Preconnect
+    if (!empty($opts['preconnect'])) {
+        $origins = array_map('trim', explode(',', $opts['preconnect']));
+        foreach ($origins as $origin) {
+            if ($origin) {
+                echo '<link rel="preconnect" href="'.esc_url($origin).'" crossorigin />\n';
+            }
+        }
     }
-    if( ! $load_scripts ) {
-        wp_dequeue_script('wpcf7-recaptcha-js-extra');
-		wp_dequeue_script('wpcf7-recaptcha');
-		wp_dequeue_script('google-recaptcha');
-        wp_dequeue_style('contact-form-7');		
+    // Preload
+    if (!empty($opts['preload'])) {
+        $assets = array_map('trim', explode(',', $opts['preload']));
+        foreach ($assets as $asset) {
+            if ($asset) {
+                $as = 'auto';
+                if (preg_match('/\.woff2?$/', $asset)) $as = 'font';
+                elseif (preg_match('/\.js$/', $asset)) $as = 'script';
+                elseif (preg_match('/\.css$/', $asset)) $as = 'style';
+                elseif (preg_match('/\.(jpg|jpeg|png|gif|webp|svg)$/', $asset)) $as = 'image';
+                echo '<link rel="preload" href="'.esc_url($asset).'" as="'.$as.'" crossorigin />\n';
+            }
+        }
     }
-}
-/*! 
-NOTE:
-To find the handler-names, I used the code at: //https://cameronjonesweb.com.au/blog/how-to-find-out-the-handle-for-enqueued-wordpress-scripts/ 
-*/
+}, 2); // Early in <head>
+// --- End preconnect/preload prototype --- //
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// --- Heartbeat API Control (prototype) --- //
+add_filter('heartbeat_settings', function($settings) {
+    $opts = get_option('wpso_options');
+    if (!is_admin()) return $settings;
+    if (empty($opts['heartbeat']) || $opts['heartbeat'] === 'normal') return $settings;
+    if ($opts['heartbeat'] === 'throttle') {
+        $settings['interval'] = 60; // 1 request per minute
+    } elseif ($opts['heartbeat'] === 'disable') {
+        $settings['interval'] = 600; // Effectively disables
+    }
+    return $settings;
+});
+add_action('init', function() {
+    $opts = get_option('wpso_options');
+    if (!empty($opts['heartbeat']) && $opts['heartbeat'] === 'disable') {
+        wp_deregister_script('heartbeat');
+    }
+});
+// --- End Heartbeat API control prototype --- //
 
-/*! 
-The main intention here is as follows:
-1. Remove the "outdated" jQuery core-lib used (in the front-end, mind)---
-2. Add and enqueue the latest/newest jQuery core-lib
+// --- Critical CSS UI (global + per-page) --- //
+add_action('add_meta_boxes', function() {
+    add_meta_box('wpso_critical_css', 'WP Speed Optimizer: Critical CSS', 'wpso_perpage_critical_css_metabox', null, 'side', 'default');
+});
+function wpso_perpage_critical_css_metabox($post) {
+    $css = get_post_meta($post->ID, '_wpso_critical_css', true) ?: '';
+    echo '<textarea name="wpso_critical_css" rows="6" style="width:100%" placeholder="Paste critical CSS for this page only">'.esc_textarea($css).'</textarea>';
+    echo '<br><small>Overrides global critical CSS for this page.</small>';
+}
+add_action('save_post', function($post_id) {
+    if (isset($_POST['wpso_critical_css'])) {
+        update_post_meta($post_id, '_wpso_critical_css', wp_kses_post($_POST['wpso_critical_css']));
+    }
+});
+add_action('wp_head', function() {
+    if (is_singular()) {
+        $css = get_post_meta(get_queried_object_id(), '_wpso_critical_css', true);
+        if ($css) {
+            echo "<style id='wpso-critical-css'>" . $css . "</style>\n";
+            return;
+        }
+    }
+    $opts = get_option('wpso_options');
+    if (!empty($opts['critical_css'])) {
+        echo "<style id='wpso-critical-css'>" . $opts['critical_css'] . "</style>\n";
+    }
+}, 1);
 
-3. Otherwise just add/queue-up your needed external jQuery-scripts - after the dotted line!
-*/
-add_action('wp_enqueue_scripts','replace_add_core_jquery_version');
-function replace_add_core_jquery_version(){
-if	(!is_admin()){
-wp_deregister_script('jquery-core');
-//wp_deregister_script('jquery-migrate');
+// --- Auto-generate Critical CSS (Node.js 'critical' integration, prototype/experimental) --- //
+add_action('save_post', function($post_id) {
+    // Only for public posts/pages
+    if (wp_is_post_revision($post_id) || get_post_status($post_id) !== 'publish') return;
+    $url = get_permalink($post_id);
+    $output_file = sys_get_temp_dir() . '/wpso_critical_' . $post_id . '.css';
+    $cmd = 'command -v critical';
+    $has_critical = trim(shell_exec($cmd));
+    if ($has_critical) {
+        // Try to generate critical CSS
+        $cmd = 'critical --minify --width 1300 --height 900 ' . escapeshellarg($url) . ' --extract --inline false --timeout 30000 --output ' . escapeshellarg($output_file);
+        @exec($cmd, $out, $ret);
+        if ($ret === 0 && file_exists($output_file)) {
+            $css = file_get_contents($output_file);
+            if ($css) {
+                update_post_meta($post_id, '_wpso_critical_css', $css);
+            }
+            @unlink($output_file);
+        }
+    }
+}, 20);
 
+// --- Move CSS to Footer (experimental/advanced) --- //
+add_action('wp_enqueue_scripts', function() {
+    $opts = get_option('wpso_options');
+    if (!empty($opts['move_css_footer']) && !is_admin()) {
+        global $wp_styles;
+        foreach ($wp_styles->queue as $handle) {
+            // Don't move critical/above-the-fold CSS (handled inline)
+            if ($handle === 'wpso-critical-css') continue;
+            $wp_styles->add_data($handle, 'group', 1);
+        }
+    }
+}, 1001);
 
-wp_register_script('jquery-core','https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js',array(),'3.6.4',true);	
-wp_script_add_data('jquery-core', array( 'module','integrity','crossorigin' ) , array( 'sha512-pumBsjNRGGqkPzKHndZMaAG+bir374sORyzM3uulLV14lN5LyykqNk8eEeUlUkB3U0M4FApyaHraT65ihJhDpQ==', 'anonymous' ) );
-
-//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-/*! 
-Although, jQuery-Migrate is no longer included/necessary from Wordpress v5.5, I added it anyway, if one should need it for whatever reason!
-Uncomment and enqueue, if this should otherwise be the case...
-*/ 
-/*
-wp_enqueue_script('jquery-migrate','"'https://cdnjs.cloudflare.com/ajax/libs/jquery-migrate/3.4.0/jquery-migrate.min.js',array(),'3.4.0',true);
-wp_script_add_data( 'jquery-migrate', array( 'module','integrity','crossorigin' ) , array( 'sha512-QDsjSX1mStBIAnNXx31dyvw4wVdHjonOwrkaIhpiIlzqGUCdsI62MwQtHpJF+Npy2SmSlGSROoNWQCOFpqbsOg==', 'anonymous' ) );
-*/
-wp_enqueue_script('instantpage','https://cdnjs.cloudflare.com/ajax/libs/instant.page/5.2.0/instantpage.min.js',array(),'5.2.0',true);
-wp_script_add_data( 'instantpage', array( 'module','integrity','crossorigin' ) , array( 'sha512-p8l0Kir2Q2O+MWF/+qw2yM2LQQf0+m0AMD0EvGTFFL9vHquAXMRQKuyFBvHdTWpGEgIbXZxd9vjCRPUHeAhsOA==', 'anonymous' ));
-}
-}
-
-
-/*!
-Regarding the wp_script_data: 
-The integrity and crossorigin attributes are used for Subresource Integrity (SRI) checking (https://www.w3.org/TR/SRI/). 
-This allows browsers to ensure that resources hosted on third-party servers have not been tampered with. 
-Use of SRI is recommended as a best-practice, whenever libraries are loaded from a third-party source. Read more at srihash.org
-*/
-
-/*! 
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/*! 
-Custom Scripting to Move CSS and JavaScript from the Head to the Footer 
-Here we now move all of the javascript (gathered and enqueued into handlers) down to the bottom of our HTML
-*/
-function remove_head_scripts() {
-remove_action('wp_head', 'wp_print_styles');	
-remove_action('wp_head', 'wp_print_scripts');
-remove_action('wp_head', 'wp_print_head_scripts', 9);
-remove_action('wp_head', 'wp_enqueue_scripts', 1);
-
-add_action('wp_footer', 'wp_print_styles');
-add_action('wp_footer', 'wp_print_scripts', 5);
-add_action('wp_footer', 'wp_enqueue_scripts', 5);
-add_action('wp_footer', 'wp_print_head_scripts', 5);
-}
-add_action( 'wp_enqueue_scripts', 'remove_head_scripts' );
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*! 
-Automatically create meta description from the_content 
-*/
-
-function create_meta_desc() {
- global $post;
-  if (!is_single()) { return; }
-  $meta = strip_tags($post->post_content);
-  $meta = strip_shortcodes($post->post_content);
-  $meta = str_replace(array("\n", "\r", "\t"), ' ', $meta);
-  $meta = substr($meta, 0, 125);
-  echo "<meta name='description' content='$meta' />";
-}
-add_action('wp_head', 'create_meta_desc');
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*!
-Minify HTML-code on the fly, removing line-breaks and white-spaces...
-*/
-
-class FLHM_HTML_Compression
-{
-protected $flhm_compress_css = true;
-protected $flhm_compress_js = true;
-protected $flhm_info_comment = true;
-protected $flhm_remove_comments = true;
-protected $html;
-public function __construct($html)
-{
-if (!empty($html))
-{
-$this->flhm_parseHTML($html);
-}
-}
-public function __toString()
-{
-return $this->html;
-}
-protected function flhm_bottomComment($raw, $compressed)
-{
-$raw = strlen($raw);
-$compressed = strlen($compressed);
-$savings = ($raw-$compressed) / $raw * 100;
-$savings = round($savings, 2);
-return '<!--HTML compressed, size saved '.$savings.'%. From '.$raw.' bytes, now '.$compressed.' bytes-->';
-}
-protected function flhm_minifyHTML($html)
-{
-$pattern = '/<(?<script>script).*?<\/script\s*>|<(?<style>style).*?<\/style\s*>|<!(?<comment>--).*?-->|<(?<tag>[\/\w.:-]*)(?:".*?"|\'.*?\'|[^\'">]+)*>|(?<text>((<[^!\/\w.:-])?[^<]*)+)|/si';
-preg_match_all($pattern, $html, $matches, PREG_SET_ORDER);
-$overriding = false;
-$raw_tag = false;
-$html = '';
-foreach ($matches as $token)
-{
-$tag = (isset($token['tag'])) ? strtolower($token['tag']) : null;
-$content = $token[0];
-if (is_null($tag))
-{
-if ( !empty($token['script']) )
-{
-$strip = $this->flhm_compress_js;
-}
-else if ( !empty($token['style']) )
-{
-$strip = $this->flhm_compress_css;
-}
-else if ($content == '<!--wp-html-compression no compression-->')
-{
-$overriding = !$overriding; 
-continue;
-}
-else if ($this->flhm_remove_comments)
-{
-if (!$overriding && $raw_tag != 'textarea')
-{
-$content = preg_replace('/<!--(?!\s*(?:\[if [^\]]+]|<!|>))(?:(?!-->).)*-->/s', '', $content);
-}
-}
-}
-else
-{
-if ($tag == 'pre' || $tag == 'textarea')
-{
-$raw_tag = $tag;
-}
-else if ($tag == '/pre' || $tag == '/textarea')
-{
-$raw_tag = false;
-}
-else
-{
-if ($raw_tag || $overriding)
-{
-$strip = false;
-}
-else
-{
-$strip = true; 
-$content = preg_replace('/(\s+)(\w++(?<!\baction|\balt|\bcontent|\bsrc)="")/', '$1', $content); 
-$content = str_replace(' />', '/>', $content);
-}
-}
-} 
-if ($strip)
-{
-$content = $this->flhm_removeWhiteSpace($content);
-}
-$html .= $content;
-} 
-return $html;
-} 
-public function flhm_parseHTML($html)
-{
-$this->html = $this->flhm_minifyHTML($html);
-if ($this->flhm_info_comment)
-{
-$this->html .= "\n" . $this->flhm_bottomComment($html, $this->html);
-}
-}
-protected function flhm_removeWhiteSpace($str)
-{
-$str = str_replace("\t", ' ', $str);
-$str = str_replace("\n",  '', $str);
-$str = str_replace("\r",  '', $str);
-while (stristr($str, '  '))
-{
-$str = str_replace('  ', ' ', $str);
-}   
-return $str;
-}
-}
-function flhm_wp_html_compression_finish($html)
-{
-return new FLHM_HTML_Compression($html);
-}
-	
-add_action('get_header', 'flhm_wp_html_compression_start');
-function flhm_wp_html_compression_start()
-{
-ob_start('flhm_wp_html_compression_finish');
+// --- HTML Minification (experimental) --- //
+add_action('template_redirect', function() {
+    $opts = get_option('wpso_options');
+    if (!empty($opts['minify_html']) && !is_admin()) {
+        ob_start('wpso_minify_html');
+    }
+});
+function wpso_minify_html($html) {
+    // Remove whitespace between tags, line breaks, and extra spaces
+    $html = preg_replace('/>\s+</', '><', $html);
+    $html = preg_replace('/\s{2,}/', ' ', $html);
+    $html = str_replace(["\r", "\n", "\t"], '', $html);
+    return $html;
 }
 
-/*!
- https://zuziko.com/tutorials/how-to-minify-html-in-wordpress-without-a-plugin/ by David Green (Note: EFFIN' BRILLIANT!!!) 
-*/
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*! https://kinsta.com/blog/defer-parsing-of-javascript/#functions*/
-add_filter( 'script_loader_tag', 'defer_parsing_of_js', 10 );	
-function defer_parsing_of_js( $url ) {
-    if ( is_user_logged_in() ) return $url; //don't break WP Admin
-    if ( FALSE === strpos( $url, '.js' ) ) return $url;
-    if ( strpos( $url, 'jquery.min.js' ) ) return $url;
-    return str_replace( ' src', ' defer src', $url );
+// --- Google Fonts Detection Helper --- //
+function wpso_detect_google_fonts() {
+    global $wp_styles, $wp_scripts;
+    $fonts = [];
+    if (isset($wp_styles->registered)) {
+        foreach ($wp_styles->registered as $handle => $style) {
+            if (isset($style->src) && strpos($style->src, 'fonts.googleapis.com') !== false) {
+                $fonts[] = ['handle' => $handle, 'type' => 'style', 'src' => $style->src];
+            }
+        }
+    }
+    if (isset($wp_scripts->registered)) {
+        foreach ($wp_scripts->registered as $handle => $script) {
+            if (isset($script->src) && strpos($script->src, 'fonts.googleapis.com') !== false) {
+                $fonts[] = ['handle' => $handle, 'type' => 'script', 'src' => $script->src];
+            }
+        }
+    }
+    return $fonts;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-add_action( 'wp_head', 'my_GA4_1_js' );	
-function my_GA4_1_js() {
-global $GA4_string;
-echo '<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id='.$GA4_string.'"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag(\'js\', new Date());
-  gtag(\'config\', \''.$GA4_string.'\');
-</script>';}
-// Add hook for front-end <head></head>
-}
-
-
-/**
-add_action( 'wp_head', 'my_GTM_1_js' );
-function my_GTM_1_js(){
-global $GTM_string;
-echo '<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({\'gtm.start\':
-new Date().getTime(),event:\'gtm.js\'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!=\'dataLayer\'?\'&l=\'+l:\'\';j.async=true;j.src=
-\'https://www.googletagmanager.com/gtm.js?id=\'+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,\'script\',\'dataLayer\',\''.$GTM_string.'\');</script>
-<!-- End Google Tag Manager -->';
-// Add hook for front-end <head></head>
-}
-
-add_action('wp_body_open', 'add_code_on_body_open');
-function add_code_on_body_open() {
-global $GTM_string;
-    echo '<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id='.$GTM_string.'"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->';
-}
-*/
-
-}
+// --- Move JS to Footer (experimental/advanced) --- //
+add_action('wp_enqueue_scripts', function() {
+    $opts = get_option('wpso_options');
+    if (!empty($opts['move_js_footer']) && !is_admin()) {
+        global $wp_scripts;
+        $skip = [
+            'jquery', 'jquery-core', 'jquery-migrate', 'wp-polyfill', 'wp-hooks', 'wp-i18n',
+            // Add more handles here if needed for safety
+        ];
+        foreach ($wp_scripts->queue as $handle) {
+            if (in_array($handle, $skip)) continue;
+            $wp_scripts->add_data($handle, 'group', 1);
+        }
+    }
+}, 1002); 
 
 /*! 
-Sources:
+Sources (Past & previous):
 Remove Google Fonts:
 https://stackoverflow.com/questions/29134113/how-to-remove-or-dequeue-google-fonts-in-wordpress-twentyfifteen/45633445#45633445
 https://stackoverflow.com/users/839434/payter 
@@ -472,8 +577,8 @@ Source: Brian Jackson: "How To Speed-up wordpress" (PDF)- kinsta.com
 
 
 Remove extra CSS that the 'Recent Comments' widget injects:
-https://wordpress.stackexchange.com/revisions/3816/5 */
-(Orignally by: Andrew Ryno)
+https://wordpress.stackexchange.com/revisions/3816/5 
+(Originally by: Andrew Ryno)
 
 
 Remove wp-version number params (scopes) from scripts and styles:
@@ -506,16 +611,6 @@ https://kinsta.com/blog/defer-parsing-of-javascript/#functions
 Code used regarding JS-lib's et al:
 https://wordpress.stackexchange.com/questions/257317/update-jquery-version
 https://www.paulund.co.uk/dequeue-styles-and-scripts-in-wordpress
-
-The Instant.Page script by Alexandre Dieulot:
-https://instant.page/
-
-SRI-string adding and usage inspired by: 
-https://stackoverflow.com/questions/44827134/wordpress-script-with-integrity-and-crossorigin (See:cherryaustin's comment) 
-
-Google Analytics and Google Tag Manager Code:
-https://analytics.google.com/
-https://tagmanager.google.com/ 
 
 
 For development-purposes:
