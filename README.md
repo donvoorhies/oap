@@ -3,16 +3,33 @@
 
 An "anthology" of (IMO) some snazzy Wordpress function-codes that I've come across over time, which I (earlier) used to optimize Wordpress-installations with.
 
-The following functions, which this plugin quietly performs, are (as of v.1.0.8, 05/05/2023):
-- Pingbacks and Self-Pingbacks are disabled
-- Removed (unnecessary) code and -functions in the header (see the changelog for details)
-- Making the RECAPTCHA-function now run silently on the contact page (RECAPTCHA-logo now hidden)
-- Links (and is ready to use) the newest, commonly-used jQuery-lib(s) (in Wordpress) from a CDN (currently cdnjs.com)
-- Adds Alexandre Dieulot’s fascinating “instant.page”-functionality
-- Adds SRI hashes and parameters on relevant URI’s (for obvious security reasons; if and where possible)
-- Removing versions + params (scopes) on URI's
-- Deferring/async js-files
-- NEW!: Google Analytics v.4.0 (GA4)-support and Google Tag Manager-support, too (although the latter is optional)
+The following functions, which this plugin quietly performs, are (as of v.2.0.0, 14/05/2025):
+* Removes emoji scripts/styles
+* Disables embeds
+* Strips query strings from static resources
+* Removes WordPress version from head
+* Inlines above-the-fold critical CSS (filter: `wpso_critical_css`)
+* Defers non-essential JS for faster first paint
+* Removes wp-version number params from scripts and styles
+* Removes Google Fonts (for most themes/plugins)
+* Prevents SSL test on xmlrpc.php
+* Removes version info from feeds
+* Removes unnecessary header info (RSD, wlwmanifest, shortlink, REST, feeds, adjacent posts)
+* Disables pingback and trackback notifications
+* Disables self-pingbacks
+* Removes extra CSS from Recent Comments widget
+* Minifies CSS & JS (production-grade)
+* Combines CSS & JS (production-grade)
+* Adds <preconnect> for user-specified origins
+* Adds <preload> for user-specified assets
+* Heartbeat API control (normal/throttle/disable)
+* Minimalist settings page for toggling features
+* Global and per-page critical CSS UI
+* Auto-generates critical CSS using Node.js 'critical' if available (prototype/experimental)
+* Optionally moves all CSS files to the footer (experimental, may cause FOUC)
+* Optionally minifies HTML output (experimental)
+* Toggle to allow or block Google Fonts for privacy & speed
+* Optionally moves all JavaScript files to the footer (experimental, may break some plugins/themes)
 
 
 Installation:
@@ -48,6 +65,25 @@ This plugin's collecton of code used herein is collected, "compiled" and assembl
 
 
 Changelog:
+2.0.0 : May 14th, 2025
+
+* Critical CSS UI (global) & Above-the-fold optimization: critical CSS inlining and JS defer - both reinstated
+
+* User-requested: Google Fonts removal, SSL test prevention, feed version removal, header cleanup, pingback/trackback/self-pingback disabling, Recent Comments CSS removal, and version param cleanup 
+
+* Minify/combine CSS & JS, preconnect, preload, Heartbeat API control, and settings page (all prototype) 
+
+* Production-grade minify/combine 
+
+* and auto-generation via Node.js 'critical' (prototype/experimental) 
+
+* Added experimental option to move CSS files from header to footer 
+
+* Added HTML minification (removes whitespace and line-breaks) 
+
+* Added toggle to allow or block Google Fonts 
+
+* Added option to move JavaScript files from header to footer 
 1.0.8 : May 5th, 2023
 - Removed all code pertaining to the CSS "Above The Fold" and the CSS-defering (for now)
 - Updated CDN-URLS and their respective SRI-hashes to updated jQuery-libraries 
