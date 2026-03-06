@@ -30,6 +30,9 @@ if (!defined('WPSO_CACHE_DIR')) {
 if (!defined('WPSO_CACHE_URL')) {
     define('WPSO_CACHE_URL', content_url('/' . WPSO_CACHE_DIR_NAME . '/'));
 }
+if (!defined('WPSO_PLUGIN_VERSION')) {
+    define('WPSO_PLUGIN_VERSION', '2.0.2');
+}
 
 /**
  * Retrieves the plugin's options using a static cache for performance.
@@ -201,7 +204,7 @@ function wpso_setup_cache_dir() { $cache_dir = WPSO_CACHE_DIR; if (!is_dir($cach
  * @param string $type        Type of asset ('css' or 'js').
  * @return string MD5 hash representing the cache key.
  */
-function _wpso_generate_cache_key($assets_data, $type = 'css') { $key_string = ''; foreach ($assets_data as $h => $d) { $key_string.=$h.($d['ver']??'0'); if(isset($d['path'])&&file_exists($d['path'])){$key_string.=filemtime($d['path']);}} return md5($key_string.$type.get_bloginfo('version'));}
+function _wpso_generate_cache_key($assets_data, $type = 'css') { $key_string = ''; foreach ($assets_data as $h => $d) { $key_string.=$h.($d['ver']??'0'); if(isset($d['path'])&&file_exists($d['path'])){$key_string.=filemtime($d['path']);}} return md5($key_string.$type.get_bloginfo('version').WPSO_PLUGIN_VERSION);}
 
 /**
  * Main function to register and apply frontend optimizations.
@@ -297,6 +300,7 @@ function wpso_register_optimizations() {
                 $script_obj = $wp_scripts->registered[$handle] ?? null; if (!$script_obj || !$script_obj->src || strpos($script_obj->src, '.js') === false) continue;
                 $script_group = (int) ($script_obj->extra['group'] ?? 0);
                 if ($script_group !== 1) continue;
+                if (($wp_scripts->get_data($handle, 'type') ?? '') === 'module') continue;
                 $script_deps = is_array($script_obj->deps ?? null) ? $script_obj->deps : [];
                 if (array_intersect($script_deps, ['jquery', 'jquery-core', 'jquery-migrate'])) continue;
                 $has_inline_payload = !empty($script_obj->extra['before']) || !empty($script_obj->extra['after']) || !empty($script_obj->extra['data']);
