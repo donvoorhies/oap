@@ -276,7 +276,7 @@ function wpso_register_optimizations() {
     $opts = wpso_get_options();
     wpso_debug_log('wpso_register_optimizations entered with options: ' . wp_json_encode($opts));
 
-    $has_enabled_runtime_feature = !empty($opts['combine']) || !empty($opts['minify']) || !empty($opts['minify_html']);
+    $has_enabled_runtime_feature = !empty($opts['combine']) || !empty($opts['minify_html']);
     $force_core_optimizations = (bool) apply_filters('wpso_force_core_optimizations', false, $opts);
     if (!$has_enabled_runtime_feature && !$force_core_optimizations) {
         wpso_debug_log('failsafe early return: no runtime feature enabled and no force override');
