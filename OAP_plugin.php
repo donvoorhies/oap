@@ -182,14 +182,7 @@ function _wpso_remove_version_query_arg($src) {
     if (!is_string($src) || $src === '') {
         return $src;
     }
-    $parts = wp_parse_url($src);
-    if (empty($parts['path'])) {
-        return $src;
-    }
-    $ext = strtolower(pathinfo($parts['path'], PATHINFO_EXTENSION));
-    if (in_array($ext, ['css', 'js'], true) && strpos($src, '?') !== false) {
-        $src = strtok($src, '?');
-    }
+    $src = remove_query_arg(['ver', 'version', 'wpver', 'wpv'], $src);
     return $src;
 }
 
@@ -220,6 +213,8 @@ function _wpso_generate_cache_key($assets_data, $type = 'css') { $key_string = '
  */
 function wpso_register_optimizations() {
     $opts = wpso_get_options();
+
+    add_action('wp_head', 'wpso_output_push_prompt_contrast_css', 99);
 
     // --- Core Optimizations (Emoji, oEmbed, Version Strings, Generator Tag) ---
     // These are generally considered safe and foundational.
@@ -260,6 +255,7 @@ function wpso_register_optimizations() {
                 if (in_array($handle, $skip_handles_css, true)) continue;
                 if (isset($wp_styles->registered['admin-bar']->deps) && is_array($wp_styles->registered['admin-bar']->deps) && in_array($handle, $wp_styles->registered['admin-bar']->deps, true)) continue;
                 $style_obj = $wp_styles->registered[$handle] ?? null; if (!$style_obj || !$style_obj->src || strpos($style_obj->src, '.css') === false) continue;
+                if (wpso_should_skip_css_combine($style_obj->src, $handle)) continue;
                 $resolved_path = wpso_resolve_url($style_obj->src);
                 $assets_data_css[$handle] = ['ver' => $style_obj->ver, 'path' => (filter_var($resolved_path, FILTER_VALIDATE_URL) ? null : $resolved_path), 'src' => $style_obj->src];
                 $handles_to_combine_css[] = $handle;
@@ -382,7 +378,44 @@ function wpso_should_skip_js_combine($src, $handle = '') {
         'cf-chl',
         'recaptcha',
         'hcaptcha',
+        'onesignal',
+        'webpush',
+        'push-notification',
+        'notification',
     ];
+
+    $patterns = apply_filters('wpso_skip_js_combine_patterns', $patterns, $src, $handle);
+
+    foreach ($patterns as $pattern) {
+        if (strpos($haystack, $pattern) !== false) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/**
+ * Returns true if a stylesheet should not be CSS-combined.
+ *
+ * @since 2.0.2
+ * @param string $src    Style source URL.
+ * @param string $handle Style handle.
+ * @return bool
+ */
+function wpso_should_skip_css_combine($src, $handle = '') {
+    $haystack = strtolower((string) $handle . ' ' . (string) $src);
+
+    $patterns = [
+        'onesignal',
+        'webpush',
+        'push-notification',
+        'notification',
+        'recaptcha',
+        'hcaptcha',
+    ];
+
+    $patterns = apply_filters('wpso_skip_css_combine_patterns', $patterns, $src, $handle);
 
     foreach ($patterns as $pattern) {
         if (strpos($haystack, $pattern) !== false) {
@@ -456,6 +489,52 @@ function wpso_minify_html_buffer($html) {
     }
     
     return trim($html);
+}
+
+/**
+ * Outputs lightweight contrast fixes for common push-notification prompts.
+ *
+ * @since 2.0.2
+ * @return void
+ */
+function wpso_output_push_prompt_contrast_css() {
+    echo '<style id="wpso-push-prompt-contrast">';
+    echo '.pn-wrapper,';
+    echo '.onesignal-slidedown-container,';
+    echo '.onesignal-popover-container,';
+    echo '#onesignal-slidedown-container,';
+    echo '#onesignal-popover-container,';
+    echo '.webpushr-prompt-wrapper,';
+    echo '.pushnotification-prompt,';
+    echo '[class*="push-notification" i],';
+    echo '[id*="push-notification" i],';
+    echo '[class*="notification-prompt" i],';
+    echo '[id*="notification-prompt" i]';
+    echo '{color:#111 !important;}';
+
+    echo '.pn-wrapper{background:#fff !important;color:#111 !important;}';
+    echo '.pn-wrapper *{color:#111 !important;}';
+
+    echo '.pn-wrapper button,';
+    echo '.onesignal-slidedown-container button,';
+    echo '.onesignal-popover-container button,';
+    echo '#onesignal-slidedown-container button,';
+    echo '#onesignal-popover-container button,';
+    echo '.webpushr-prompt-wrapper button,';
+    echo '.pushnotification-prompt button,';
+    echo '[class*="push-notification" i] button,';
+    echo '[id*="push-notification" i] button,';
+    echo '[class*="notification-prompt" i] button,';
+    echo '[id*="notification-prompt" i] button';
+    echo '{color:#111 !important;}';
+
+    echo '.onesignal-slidedown-container .onesignal-popover-button.primary,';
+    echo '.onesignal-popover-container .onesignal-popover-button.primary,';
+    echo '#onesignal-slidedown-container .onesignal-popover-button.primary,';
+    echo '#onesignal-popover-container .onesignal-popover-button.primary';
+    echo '{color:#fff !important;background-color:#005fb8 !important;}';
+
+    echo '</style>';
 }
 
 /*! 

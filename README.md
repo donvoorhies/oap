@@ -56,6 +56,12 @@ This plugin's collecton of code used herein is collected, "compiled" and assembl
 
 
 Changelog:
+2.0.2 : March 6th, 2026
+
+* Fixed push-notification prompt contrast issue (white text on white background), including explicit `.pn-wrapper` styling fallback
+* Improved compatibility for third-party notification/challenge scripts by skipping JS/CSS combine for common push/captcha providers
+* Adjusted query-string cleanup to remove only version-like params instead of stripping all query args from CSS/JS assets
+
 2.0.1 : March 6th, 2026
 
 * Compatibility refactor: removed overlapping optimization features from OAP so it can run alongside `critical-path-css-v2`
