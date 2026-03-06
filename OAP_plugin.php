@@ -240,7 +240,7 @@ function wpso_register_optimizations() {
     // --- Minify & Combine CSS/JS with Caching ---
     // This is a complex operation, hooked late to process enqueued assets.
     add_action('wp_enqueue_scripts', function() use ($opts) {
-        if (is_admin() || (empty($opts['minify']) && empty($opts['combine']))) { return; } // Only run if options are set and not in admin
+        if (is_admin() || empty($opts['combine'])) { return; } // Combine pipeline is disabled unless explicitly enabled in settings
 
         global $wp_styles, $wp_scripts; 
         static $done_css_combine = false; // Renamed for clarity
@@ -339,7 +339,8 @@ function wpso_register_optimizations() {
     add_action('init', function() use ($opts) { if(is_admin()&&!empty($opts['heartbeat'])&&$opts['heartbeat']==='disable')wp_deregister_script('heartbeat');});
 
     // --- Experimental Feature: Minify HTML Output ---
-    if(!empty($opts['minify_html'])){
+    $enable_html_minify = (bool) apply_filters('wpso_enable_html_minify', false, $opts);
+    if(!empty($opts['minify_html']) && $enable_html_minify){
         add_action('template_redirect',function()use($opts){
             if(is_admin()||is_customize_preview()||defined('XMLRPC_REQUEST')||defined('REST_REQUEST')||defined('DOING_AJAX')||defined('DOING_CRON')||is_feed()||is_robots()||is_embed()||is_404()||is_search())return;
             $handlers=ob_list_handlers(); if(in_array('wpso_minify_html_buffer',$handlers,true))return;
