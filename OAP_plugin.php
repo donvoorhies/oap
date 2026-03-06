@@ -299,6 +299,7 @@ function wpso_register_optimizations() {
                 if (in_array($handle, $skip_handles_js, true)) continue;
                 if (isset($wp_scripts->registered['admin-bar']->deps) && is_array($wp_scripts->registered['admin-bar']->deps) && in_array($handle, $wp_scripts->registered['admin-bar']->deps, true)) continue;
                 $script_obj = $wp_scripts->registered[$handle] ?? null; if (!$script_obj || !$script_obj->src || strpos($script_obj->src, '.js') === false) continue; if (!empty($script_obj->extra['group']) && $script_obj->extra['group'] === 1) continue;
+                if (wpso_should_skip_js_combine($script_obj->src, $handle)) continue;
                 $resolved_path = wpso_resolve_url($script_obj->src);
                 $assets_data_js[$handle] = ['ver' => $script_obj->ver, 'path' => (filter_var($resolved_path, FILTER_VALIDATE_URL) ? null : $resolved_path), 'src' => $script_obj->src];
                 $handles_to_combine_js[] = $handle;
@@ -360,6 +361,37 @@ function _wpso_fetch_asset_content($resolved_src) { if (!$resolved_src) return '
  * @return string Resolved file path, validated URL, or empty string.
  */
 function wpso_resolve_url($src) { if(empty($src)||!is_string($src))return ''; if(strpos($src,'http://')===0||strpos($src,'https://')===0){return filter_var($src,FILTER_VALIDATE_URL)?$src:'';} if(strpos($src,'//')===0){$full_url=(is_ssl()?'https:':'http:').$src; return filter_var($full_url,FILTER_VALIDATE_URL)?$full_url:'';} $file_path=''; $norm_src=wp_normalize_path($src); if(strpos($norm_src,wp_normalize_path(ABSPATH))===0&&file_exists($norm_src)){return $norm_src;} $site_url=wp_normalize_path(site_url('/')); $content_url=wp_normalize_path(content_url()); $plugins_url=wp_normalize_path(plugins_url()); $tpl_uri=wp_normalize_path(get_template_directory_uri()); $st_uri=wp_normalize_path(get_stylesheet_directory_uri()); if(strpos($norm_src,$content_url)===0){$file_path=wp_normalize_path(WP_CONTENT_DIR).str_replace($content_url,'',$norm_src);}elseif(strpos($norm_src,$plugins_url)===0){$file_path=wp_normalize_path(WP_PLUGIN_DIR).str_replace($plugins_url,'',$norm_src);}elseif($st_uri!==$tpl_uri&&strpos($norm_src,$st_uri)===0){$file_path=wp_normalize_path(get_stylesheet_directory()).str_replace($st_uri,'',$norm_src);}elseif(strpos($norm_src,$tpl_uri)===0){$file_path=wp_normalize_path(get_template_directory()).str_replace($tpl_uri,'',$norm_src);}elseif(strpos($norm_src,'/')===0){$file_path=wp_normalize_path(ABSPATH).ltrim($norm_src,'/');}elseif(strpos($norm_src,$site_url)===0){$rel_path=str_replace($site_url,'',$norm_src); $file_path=wp_normalize_path(ABSPATH).ltrim($rel_path,'/');} if($file_path){$norm_file_path=wp_normalize_path($file_path); if(file_exists($norm_file_path)&&strpos(wp_normalize_path(realpath($norm_file_path)),wp_normalize_path(ABSPATH))===0){return $norm_file_path;}} return filter_var($src,FILTER_VALIDATE_URL)?$src:'';}
+
+/**
+ * Returns true if a script should not be JS-combined.
+ *
+ * Some third-party scripts (e.g., Cloudflare Turnstile/challenge scripts)
+ * depend on being loaded as a standalone script tag and can fail when bundled.
+ *
+ * @since 2.0.1
+ * @param string $src    Script source URL.
+ * @param string $handle Script handle.
+ * @return bool
+ */
+function wpso_should_skip_js_combine($src, $handle = '') {
+    $haystack = strtolower((string) $handle . ' ' . (string) $src);
+
+    $patterns = [
+        'challenges.cloudflare.com',
+        'turnstile',
+        'cf-chl',
+        'recaptcha',
+        'hcaptcha',
+    ];
+
+    foreach ($patterns as $pattern) {
+        if (strpos($haystack, $pattern) !== false) {
+            return true;
+        }
+    }
+
+    return false;
+}
 
 /**
  * Basic CSS minifier.
