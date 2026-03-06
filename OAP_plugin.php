@@ -33,6 +33,9 @@ if (!defined('WPSO_CACHE_URL')) {
 if (!defined('WPSO_PLUGIN_VERSION')) {
     define('WPSO_PLUGIN_VERSION', '2.0.2');
 }
+if (!defined('WPSO_PLUGIN_BUILD')) {
+    define('WPSO_PLUGIN_BUILD', '5eb2b41');
+}
 
 /**
  * Retrieves the plugin's options using a static cache for performance.
@@ -231,6 +234,20 @@ add_action('wp', function() {
         wpso_debug_log('wpso_register_optimizations finished');
     }
 });
+
+/**
+ * Prints a deterministic frontend build marker in HTML source.
+ *
+ * @since 2.0.3
+ * @return void
+ */
+function wpso_output_build_marker() {
+    if (is_admin()) {
+        return;
+    }
+    echo "\n<!-- WPSO build " . esc_html(WPSO_PLUGIN_BUILD) . " version " . esc_html(WPSO_PLUGIN_VERSION) . " -->\n";
+}
+add_action('wp_head', 'wpso_output_build_marker', 0);
 
 /**
  * Ensures frontend jQuery handles are registered, enqueued and printed in head.
