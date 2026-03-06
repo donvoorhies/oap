@@ -233,36 +233,54 @@ add_action('wp', function() {
 });
 
 /**
- * Forces jQuery to print in head on frontend for compatibility.
- *
- * Prevents race conditions where inline "*-after" scripts execute before
- * jQuery is available in the global scope.
+ * Ensures frontend jQuery handles are registered, enqueued and printed in head.
  *
  * @since 2.0.3
  * @return void
  */
-function wpso_force_jquery_in_head() {
+function wpso_ensure_frontend_jquery_head_integrity() {
     if (is_admin()) {
         return;
     }
 
     global $wp_scripts;
-    wp_enqueue_script('jquery');
-
     if (!($wp_scripts instanceof WP_Scripts)) {
         return;
     }
 
-    foreach (['jquery', 'jquery-core', 'jquery-migrate'] as $jquery_handle) {
-        if (isset($wp_scripts->registered[$jquery_handle])) {
-            $wp_scripts->add_data($jquery_handle, 'group', 0);
-        }
+    if (!$wp_scripts->query('jquery-core', 'registered')) {
+        wp_register_script('jquery-core', includes_url('/js/jquery/jquery.min.js'), [], null, false);
     }
 
-    wpso_debug_log('Forced jquery/jquery-core/jquery-migrate to head (group 0).');
+    if (!$wp_scripts->query('jquery-migrate', 'registered')) {
+        wp_register_script('jquery-migrate', includes_url('/js/jquery/jquery-migrate.min.js'), ['jquery-core'], null, false);
+    }
+
+    if (!$wp_scripts->query('jquery', 'registered')) {
+        wp_register_script('jquery', false, ['jquery-core', 'jquery-migrate'], null, false);
+    }
+
+    wp_enqueue_script('jquery');
+
+    foreach (['jquery', 'jquery-core', 'jquery-migrate'] as $jquery_handle) {
+        $wp_scripts->add_data($jquery_handle, 'group', 0);
+    }
+
+    wpso_debug_log('Ensured jquery stack in head and registered.');
 }
-add_action('wp_enqueue_scripts', 'wpso_force_jquery_in_head', 0);
-add_action('wp_print_scripts', 'wpso_force_jquery_in_head', 0);
+add_action('wp_enqueue_scripts', 'wpso_ensure_frontend_jquery_head_integrity', 0);
+add_action('wp_print_scripts', 'wpso_ensure_frontend_jquery_head_integrity', PHP_INT_MAX);
+
+add_filter('script_loader_tag', function($tag, $handle) {
+    if (!in_array($handle, ['jquery', 'jquery-core', 'jquery-migrate'], true)) {
+        return $tag;
+    }
+    $tag = str_replace(' defer', '', $tag);
+    $tag = str_replace(' async', '', $tag);
+    $tag = preg_replace('/\sdefer(=["\']?["\']?)?/i', '', $tag);
+    $tag = preg_replace('/\sasync(=["\']?["\']?)?/i', '', $tag);
+    return $tag;
+}, 999, 2);
 
 /**
  * Ensures jQuery is loaded before scripts that contain inline jQuery payloads.
@@ -291,6 +309,7 @@ function wpso_enforce_jquery_dependency_for_inline_scripts() {
             continue;
         }
 
+        $src = strtolower((string) ($script_obj->src ?? ''));
         $extra = is_array($script_obj->extra ?? null) ? $script_obj->extra : [];
         $inline_parts = [];
         foreach (['before', 'after', 'data'] as $key) {
@@ -303,15 +322,14 @@ function wpso_enforce_jquery_dependency_for_inline_scripts() {
             }
         }
 
-        if (empty($inline_parts)) {
-            continue;
-        }
+        $known_needs_jquery = (
+            strpos((string) $handle, 'vofa-navigation-js') !== false ||
+            strpos((string) $handle, 'imagify') !== false ||
+            strpos($src, 'imagify/assets/js/admin-bar.min.js') !== false
+        );
 
         $inline_blob = implode("\n", $inline_parts);
-        $handle_needs_jquery = (bool) preg_match('/\bjQuery\b|\$\s*\(/', $inline_blob);
-        if (!$handle_needs_jquery && strpos((string) $handle, 'vofa-navigation-js') !== false) {
-            $handle_needs_jquery = true;
-        }
+        $handle_needs_jquery = $known_needs_jquery || (bool) preg_match('/\bjQuery\b|\$\s*\(/', $inline_blob);
         if (!$handle_needs_jquery) {
             continue;
         }
@@ -330,13 +348,12 @@ function wpso_enforce_jquery_dependency_for_inline_scripts() {
     }
 
     if ($needs_jquery || wp_script_is('vofa-navigation-js', 'enqueued')) {
-        wp_enqueue_script('jquery');
-        wpso_debug_log('Enqueued jquery due to inline jQuery payload detection.');
+        wpso_ensure_frontend_jquery_head_integrity();
+        wpso_debug_log('Enforced jquery stack due to dependency detection.');
     }
 }
-add_action('wp_enqueue_scripts', 'wpso_enforce_jquery_dependency_for_inline_scripts', 1);
-add_action('wp_enqueue_scripts', 'wpso_enforce_jquery_dependency_for_inline_scripts', 999);
-add_action('wp_print_scripts', 'wpso_enforce_jquery_dependency_for_inline_scripts', 0);
+add_action('wp_enqueue_scripts', 'wpso_enforce_jquery_dependency_for_inline_scripts', PHP_INT_MAX);
+add_action('wp_print_scripts', 'wpso_enforce_jquery_dependency_for_inline_scripts', PHP_INT_MAX);
 add_action('wp_print_footer_scripts', 'wpso_enforce_jquery_dependency_for_inline_scripts', 0);
 
 // (Helper functions: _wpso_remove_version_query_arg, wpso_setup_cache_dir, _wpso_generate_cache_key - remain as before, ensure PHPDocs added if missing)
