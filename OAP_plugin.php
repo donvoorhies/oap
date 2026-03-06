@@ -233,6 +233,38 @@ add_action('wp', function() {
 });
 
 /**
+ * Forces jQuery to print in head on frontend for compatibility.
+ *
+ * Prevents race conditions where inline "*-after" scripts execute before
+ * jQuery is available in the global scope.
+ *
+ * @since 2.0.3
+ * @return void
+ */
+function wpso_force_jquery_in_head() {
+    if (is_admin()) {
+        return;
+    }
+
+    global $wp_scripts;
+    wp_enqueue_script('jquery');
+
+    if (!($wp_scripts instanceof WP_Scripts)) {
+        return;
+    }
+
+    foreach (['jquery', 'jquery-core', 'jquery-migrate'] as $jquery_handle) {
+        if (isset($wp_scripts->registered[$jquery_handle])) {
+            $wp_scripts->add_data($jquery_handle, 'group', 0);
+        }
+    }
+
+    wpso_debug_log('Forced jquery/jquery-core/jquery-migrate to head (group 0).');
+}
+add_action('wp_enqueue_scripts', 'wpso_force_jquery_in_head', 0);
+add_action('wp_print_scripts', 'wpso_force_jquery_in_head', 0);
+
+/**
  * Ensures jQuery is loaded before scripts that contain inline jQuery payloads.
  *
  * Some themes/plugins attach inline "after" scripts that call jQuery without
