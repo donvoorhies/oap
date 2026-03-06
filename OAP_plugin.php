@@ -276,7 +276,11 @@ function wpso_enforce_jquery_dependency_for_inline_scripts() {
         }
 
         $inline_blob = implode("\n", $inline_parts);
-        if (!preg_match('/\bjQuery\b/', $inline_blob)) {
+        $handle_needs_jquery = (bool) preg_match('/\bjQuery\b|\$\s*\(/', $inline_blob);
+        if (!$handle_needs_jquery && strpos((string) $handle, 'vofa-navigation-js') !== false) {
+            $handle_needs_jquery = true;
+        }
+        if (!$handle_needs_jquery) {
             continue;
         }
 
@@ -293,12 +297,15 @@ function wpso_enforce_jquery_dependency_for_inline_scripts() {
         $needs_jquery = true;
     }
 
-    if ($needs_jquery) {
+    if ($needs_jquery || wp_script_is('vofa-navigation-js', 'enqueued')) {
         wp_enqueue_script('jquery');
         wpso_debug_log('Enqueued jquery due to inline jQuery payload detection.');
     }
 }
 add_action('wp_enqueue_scripts', 'wpso_enforce_jquery_dependency_for_inline_scripts', 1);
+add_action('wp_enqueue_scripts', 'wpso_enforce_jquery_dependency_for_inline_scripts', 999);
+add_action('wp_print_scripts', 'wpso_enforce_jquery_dependency_for_inline_scripts', 0);
+add_action('wp_print_footer_scripts', 'wpso_enforce_jquery_dependency_for_inline_scripts', 0);
 
 // (Helper functions: _wpso_remove_version_query_arg, wpso_setup_cache_dir, _wpso_generate_cache_key - remain as before, ensure PHPDocs added if missing)
 /**
