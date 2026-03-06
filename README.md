@@ -61,6 +61,7 @@ Changelog:
 * Fixed push-notification prompt contrast issue (white text on white background), including explicit `.pn-wrapper` styling fallback
 * Improved compatibility for third-party notification/challenge scripts by skipping JS/CSS combine for common push/captcha providers
 * Adjusted query-string cleanup to remove only version-like params instead of stripping all query args from CSS/JS assets
+* Minor cleanup: narrowed push prompt CSS selectors to reduce side effects while preserving dark/white prompt styling
 
 2.0.1 : March 6th, 2026
 
