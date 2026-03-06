@@ -390,7 +390,14 @@ function wpso_register_optimizations() {
                         if ($content) { $combined_js_content .= rtrim($content, ';') . ";\n"; } else { $fetch_failed_js = true; error_log("WPSO: Failed JS fetch: {$h}, src: {$s_obj->src}"); continue; }
                     }
                     if ($combined_js_content && !$fetch_failed_js) {
-                        if (!empty($opts['minify'])) $combined_js_content = wpso_minify_js($combined_js_content);
+                        if (!empty($opts['minify'])) {
+                            $enable_js_minify = (bool) apply_filters('wpso_enable_js_minify', false, $opts);
+                            if ($enable_js_minify) {
+                                $combined_js_content = wpso_minify_js($combined_js_content);
+                            } else {
+                                wpso_debug_log('JS minify skipped by safety default (enable via wpso_enable_js_minify filter).');
+                            }
+                        }
                         if ($cache_dir_ok && @file_put_contents($cache_file_path_js, $combined_js_content)) {
                             wp_enqueue_script('wpso-cached-scripts-' . $cache_key_js, $cache_file_url_js, [], null, true); foreach ($handles_to_combine_js as $h) wp_dequeue_script($h);
                         } else { if (!$cache_dir_ok) error_log('WPSO: JS cache dir issue.'); else error_log('WPSO: Failed JS cache write: '.$cache_file_path_js); add_action('wp_footer', function() use ($combined_js_content) { echo '<script id="wpso-combined-js-fallback">'.$combined_js_content.'</script>'; }, 99); foreach ($handles_to_combine_js as $h) wp_dequeue_script($h); }
