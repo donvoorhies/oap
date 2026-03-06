@@ -597,8 +597,9 @@ function wpso_output_push_prompt_contrast_css() {
     echo '[id*="notification-prompt" i]';
     echo '{color:#111 !important;}';
 
-    echo '.pn-wrapper{background:linear-gradient(180deg,#000,#333) !important;color:#fff !important;}';
-    echo '.pn-wrapper *{color:#fff !important;}';
+    echo '.pn-wrapper{background:#222 !important;background-color:#222 !important;background-image:none !important;color:#fff !important;border-color:#444 !important;}';
+    echo '.pn-wrapper,.pn-wrapper *,.pn-wrapper *:before,.pn-wrapper *:after{color:#fff !important;}';
+    echo '.pn-wrapper .pn-box,.pn-wrapper .pn-inner,.pn-wrapper .pn-content,.pn-wrapper .pn-body{background:#222 !important;background-color:#222 !important;background-image:none !important;}';
 
     echo '.pn-wrapper button,';
     echo '.onesignal-slidedown-container button,';
@@ -611,7 +612,7 @@ function wpso_output_push_prompt_contrast_css() {
     echo '[id*="push-notification" i] button,';
     echo '[class*="notification-prompt" i] button,';
     echo '[id*="notification-prompt" i] button';
-    echo '{color:#fff !important;}';
+    echo '{color:#fff !important;background-color:#333 !important;border-color:#555 !important;}';
 
     echo '.onesignal-slidedown-container .onesignal-popover-button.primary,';
     echo '.onesignal-popover-container .onesignal-popover-button.primary,';
