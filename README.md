@@ -22,6 +22,8 @@ The following functions are currently provided by this plugin:
 
 Compatibility note:
 If you run this plugin together with `critical-path-css-v2`, overlapping frontend optimization features are intentionally removed from OAP to avoid conflicts.
+Many of these overlapping functions have now been moved to:
+https://github.com/donvoorhies/critical-path-css-v2
 
 
 Installation:
@@ -46,6 +48,11 @@ This plugin's collecton of code used herein is collected, "compiled" and assembl
 
 
 Changelog:
+2.0.1 : March 6th, 2026
+
+* Compatibility refactor: removed overlapping optimization features from OAP so it can run alongside `critical-path-css-v2`
+* Migration note: many frontend optimization functions are now maintained in https://github.com/donvoorhies/critical-path-css-v2
+
 2.0.0 : May 14th, 2025
 
 * Critical CSS UI (global) & Above-the-fold optimization: critical CSS inlining and JS defer - both reinstated

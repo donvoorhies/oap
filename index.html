@@ -37,6 +37,7 @@ body,html{height:100%;margin:0}body{font:16px Helvetica,Arial,Sans-Serif,Serif}m
 <li>Optionally minifies HTML output (experimental)</li>
 </ul>
 <p><strong>Compatibility note:</strong> If you run this plugin together with <code>critical-path-css-v2</code>, overlapping frontend optimization features are intentionally removed from OAP to avoid conflicts.</p>
+<p>Many of these overlapping functions have now been moved to <a href="https://github.com/donvoorhies/critical-path-css-v2" target="_blank" rel="noreferrer">https://github.com/donvoorhies/critical-path-css-v2</a>.</p>
 </article>
 
 <article>
@@ -61,6 +62,11 @@ body,html{height:100%;margin:0}body{font:16px Helvetica,Arial,Sans-Serif,Serif}m
 </article>
 <article>
 <h2>Changelog:</h2>
+<p>2.0.1 : March 6th, 2026</p>
+<ul>
+<li>Compatibility refactor: removed overlapping optimization features from OAP so it can run alongside <code>critical-path-css-v2</code></li>
+<li>Migration note: many frontend optimization functions are now maintained in <a href="https://github.com/donvoorhies/critical-path-css-v2" target="_blank" rel="noreferrer">critical-path-css-v2</a></li>
+</ul>
 <p>2.0.0 : May 14th, 2025</p>
 <ul>
 <li>Critical CSS UI (global) & Above-the-fold optimization: critical CSS inlining and JS defer - both reinstated</li>
