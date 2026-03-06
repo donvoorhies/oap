@@ -217,6 +217,12 @@ function _wpso_generate_cache_key($assets_data, $type = 'css') { $key_string = '
 function wpso_register_optimizations() {
     $opts = wpso_get_options();
 
+    $has_enabled_runtime_feature = !empty($opts['combine']) || !empty($opts['minify']) || !empty($opts['minify_html']);
+    $force_core_optimizations = (bool) apply_filters('wpso_force_core_optimizations', false, $opts);
+    if (!$has_enabled_runtime_feature && !$force_core_optimizations) {
+        return;
+    }
+
     add_action('wp_head', 'wpso_output_push_prompt_contrast_css', 99);
 
     // --- Core Optimizations (Emoji, oEmbed, Version Strings, Generator Tag) ---
