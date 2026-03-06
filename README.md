@@ -44,6 +44,9 @@ You can install this plugin via the WordPress admin panel.
 Configuration:
 Go to “Settings > WP Speed Optimizer” for the configuration of the plugin and it's optional functionalities.
 
+Troubleshooting:
+After changing optimizer rules (especially minify/combine behavior), clear old combined cache files in `wp-content/wpso-cache/` so new asset bundles are rebuilt correctly.
+
 
 Credits:
 
