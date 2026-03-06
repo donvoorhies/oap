@@ -344,6 +344,31 @@ function wpso_enforce_jquery_dependency_for_inline_scripts() {
             wpso_debug_log('Injected jquery dependency for handle: ' . $handle);
         }
 
+        if (!empty($extra['after'])) {
+            $after_blocks = is_array($extra['after']) ? $extra['after'] : [(string) $extra['after']];
+            foreach ($after_blocks as $index => $block) {
+                $block_str = (string) $block;
+                if ($block_str === '' || strpos($block_str, 'WPSO_JQ_GUARD') !== false) {
+                    continue;
+                }
+
+                $uses_jquery = (bool) preg_match('/\bjQuery\b|\$\s*\(/', $block_str) || $known_needs_jquery;
+                if (!$uses_jquery) {
+                    continue;
+                }
+
+                $after_blocks[$index] = '(function WPSO_JQ_GUARD(){'
+                    . 'var __wpsoMax=120,__wpsoTick=0;'
+                    . 'var __wpsoRun=function(){'
+                    . 'if(window.jQuery){try{' . $block_str . '}catch(e){console.error(e);}return;}'
+                    . '__wpsoTick++;if(__wpsoTick<__wpsoMax){setTimeout(__wpsoRun,50);}else{console.warn("WPSO: jQuery missing for inline script handle: ' . esc_js((string) $handle) . '");}'
+                    . '};__wpsoRun();})();';
+                wpso_debug_log('Wrapped inline after-script with jQuery guard for handle: ' . $handle);
+            }
+            $script_obj->extra['after'] = $after_blocks;
+            $wp_scripts->registered[$handle] = $script_obj;
+        }
+
         $needs_jquery = true;
     }
 
