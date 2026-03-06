@@ -271,6 +271,29 @@ function wpso_ensure_frontend_jquery_head_integrity() {
 add_action('wp_enqueue_scripts', 'wpso_ensure_frontend_jquery_head_integrity', 0);
 add_action('wp_print_scripts', 'wpso_ensure_frontend_jquery_head_integrity', PHP_INT_MAX);
 
+/**
+ * Prints jQuery early in wp_head to guarantee availability for inline after-scripts.
+ *
+ * @since 2.0.3
+ * @return void
+ */
+function wpso_print_jquery_early() {
+    if (is_admin()) {
+        return;
+    }
+
+    if (wp_script_is('jquery', 'done')) {
+        return;
+    }
+
+    wpso_ensure_frontend_jquery_head_integrity();
+    if (wp_script_is('jquery', 'registered')) {
+        wp_print_scripts(['jquery']);
+        wpso_debug_log('Printed jquery early in wp_head.');
+    }
+}
+add_action('wp_head', 'wpso_print_jquery_early', 1);
+
 add_filter('script_loader_tag', function($tag, $handle) {
     $must_blocking_handles = ['jquery', 'jquery-core', 'jquery-migrate', 'vofa-navigation-js', 'imagify-admin-bar'];
     if (!in_array($handle, $must_blocking_handles, true)) {
