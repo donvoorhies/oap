@@ -290,7 +290,8 @@ function wpso_register_optimizations() {
         }
 
         // --- Process JS --- //
-        if (!$done_js_combine && $wp_scripts && !empty($wp_scripts->queue)) {
+        $enable_js_combine = (bool) apply_filters('wpso_enable_js_combine', false, $opts);
+        if (!$done_js_combine && $enable_js_combine && $wp_scripts && !empty($wp_scripts->queue)) {
             $skip_js = ['admin-bar', 'dashicons', 'wp-admin', 'jquery', 'jquery-core', 'jquery-migrate']; 
             $skip_handles_js = apply_filters('wpso_combine_minify_skip_handles_js', $skip_js);
             $assets_data_js = []; $handles_to_combine_js = [];
