@@ -583,44 +583,50 @@ function wpso_minify_html_buffer($html) {
  * @return void
  */
 function wpso_output_push_prompt_contrast_css() {
-    echo '<style id="wpso-push-prompt-contrast">';
-    echo '.pn-wrapper,';
-    echo '.onesignal-slidedown-container,';
-    echo '.onesignal-popover-container,';
-    echo '#onesignal-slidedown-container,';
-    echo '#onesignal-popover-container,';
-    echo '.webpushr-prompt-wrapper,';
-    echo '.pushnotification-prompt,';
-    echo '[class*="push-notification" i],';
-    echo '[id*="push-notification" i],';
-    echo '[class*="notification-prompt" i],';
-    echo '[id*="notification-prompt" i]';
-    echo '{color:#111 !important;}';
+    $css = <<<CSS
+.pn-wrapper,
+.pn-wrapper .pn-box,
+.pn-wrapper .pn-inner,
+.pn-wrapper .pn-content,
+.pn-wrapper .pn-body {
+    background: #222 !important;
+    background-color: #222 !important;
+    background-image: none !important;
+    color: #fff !important;
+    border-color: #444 !important;
+}
 
-    echo '.pn-wrapper{background:#222 !important;background-color:#222 !important;background-image:none !important;color:#fff !important;border-color:#444 !important;}';
-    echo '.pn-wrapper,.pn-wrapper *,.pn-wrapper *:before,.pn-wrapper *:after{color:#fff !important;}';
-    echo '.pn-wrapper .pn-box,.pn-wrapper .pn-inner,.pn-wrapper .pn-content,.pn-wrapper .pn-body{background:#222 !important;background-color:#222 !important;background-image:none !important;}';
+.pn-wrapper,
+.pn-wrapper *,
+.pn-wrapper *:before,
+.pn-wrapper *:after {
+    color: #fff !important;
+}
 
-    echo '.pn-wrapper button,';
-    echo '.onesignal-slidedown-container button,';
-    echo '.onesignal-popover-container button,';
-    echo '#onesignal-slidedown-container button,';
-    echo '#onesignal-popover-container button,';
-    echo '.webpushr-prompt-wrapper button,';
-    echo '.pushnotification-prompt button,';
-    echo '[class*="push-notification" i] button,';
-    echo '[id*="push-notification" i] button,';
-    echo '[class*="notification-prompt" i] button,';
-    echo '[id*="notification-prompt" i] button';
-    echo '{color:#fff !important;background-color:#333 !important;border-color:#555 !important;}';
+.pn-wrapper button,
+.pn-wrapper .pn-btn-accept,
+.pn-wrapper .pn-btn-decline,
+.onesignal-slidedown-container button,
+.onesignal-popover-container button,
+#onesignal-slidedown-container button,
+#onesignal-popover-container button,
+.webpushr-prompt-wrapper button,
+.pushnotification-prompt button {
+    color: #fff !important;
+    background-color: #333 !important;
+    border-color: #555 !important;
+}
 
-    echo '.onesignal-slidedown-container .onesignal-popover-button.primary,';
-    echo '.onesignal-popover-container .onesignal-popover-button.primary,';
-    echo '#onesignal-slidedown-container .onesignal-popover-button.primary,';
-    echo '#onesignal-popover-container .onesignal-popover-button.primary';
-    echo '{color:#fff !important;background-color:#005fb8 !important;}';
+.onesignal-slidedown-container .onesignal-popover-button.primary,
+.onesignal-popover-container .onesignal-popover-button.primary,
+#onesignal-slidedown-container .onesignal-popover-button.primary,
+#onesignal-popover-container .onesignal-popover-button.primary {
+    color: #fff !important;
+    background-color: #005fb8 !important;
+}
+CSS;
 
-    echo '</style>';
+    echo '<style id="wpso-push-prompt-contrast">' . $css . '</style>';
 }
 
 /*! 
