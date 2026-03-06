@@ -272,7 +272,8 @@ add_action('wp_enqueue_scripts', 'wpso_ensure_frontend_jquery_head_integrity', 0
 add_action('wp_print_scripts', 'wpso_ensure_frontend_jquery_head_integrity', PHP_INT_MAX);
 
 add_filter('script_loader_tag', function($tag, $handle) {
-    if (!in_array($handle, ['jquery', 'jquery-core', 'jquery-migrate'], true)) {
+    $must_blocking_handles = ['jquery', 'jquery-core', 'jquery-migrate', 'vofa-navigation-js', 'imagify-admin-bar'];
+    if (!in_array($handle, $must_blocking_handles, true)) {
         return $tag;
     }
     $tag = str_replace(' defer', '', $tag);
@@ -281,6 +282,46 @@ add_filter('script_loader_tag', function($tag, $handle) {
     $tag = preg_replace('/\sasync(=["\']?["\']?)?/i', '', $tag);
     return $tag;
 }, 999, 2);
+
+/**
+ * Enforces missing dependencies for known frontend scripts at registration time.
+ *
+ * @since 2.0.3
+ * @param WP_Scripts $scripts Script registry instance.
+ * @return void
+ */
+function wpso_fix_known_frontend_script_dependencies($scripts) {
+    if (is_admin() || !($scripts instanceof WP_Scripts) || empty($scripts->registered)) {
+        return;
+    }
+
+    foreach ($scripts->registered as $handle => $script_obj) {
+        if (!is_object($script_obj)) {
+            continue;
+        }
+
+        $src = strtolower((string) ($script_obj->src ?? ''));
+        $is_vofa = strpos((string) $handle, 'vofa-navigation-js') !== false;
+        $is_imagify_admin_bar = strpos($src, 'imagify/assets/js/admin-bar.min.js') !== false || strpos((string) $handle, 'imagify-admin-bar') !== false;
+
+        if (!$is_vofa && !$is_imagify_admin_bar) {
+            continue;
+        }
+
+        if (!is_array($script_obj->deps)) {
+            $script_obj->deps = [];
+        }
+
+        if (!in_array('jquery', $script_obj->deps, true) && !in_array('jquery-core', $script_obj->deps, true)) {
+            $script_obj->deps[] = 'jquery';
+        }
+
+        $scripts->registered[$handle] = $script_obj;
+        $scripts->add_data($handle, 'group', 0);
+        wpso_debug_log('Fixed deps for handle: ' . $handle . ' src: ' . $src);
+    }
+}
+add_action('wp_default_scripts', 'wpso_fix_known_frontend_script_dependencies', 1000);
 
 /**
  * Ensures jQuery is loaded before scripts that contain inline jQuery payloads.
