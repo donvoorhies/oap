@@ -1,5 +1,13 @@
 <?php
 /**
+ * Plugin Name: OAP (Optimization Anthology Plugin)
+ * Plugin URI:  https://github.com/donvoorhies/oap
+ * Description: WordPress optimization anthology plugin focused on non-overlapping optimizations; designed to run alongside critical-path-css-v2.
+ * Version:     2.0.1
+ * Author:      Don Voorhies
+ * License:     CC BY-NC-SA 4.0
+ * Text Domain: wpso
+ *
  * OAP (Optimization Anthology Plugin)
  *
  * This plugin provides a collection of WordPress performance and security optimizations.
