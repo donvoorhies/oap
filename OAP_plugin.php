@@ -294,7 +294,13 @@ function wpso_register_optimizations() {
             foreach ($wp_scripts->queue as $handle) {
                 if (in_array($handle, $skip_handles_js, true)) continue;
                 if (isset($wp_scripts->registered['admin-bar']->deps) && is_array($wp_scripts->registered['admin-bar']->deps) && in_array($handle, $wp_scripts->registered['admin-bar']->deps, true)) continue;
-                $script_obj = $wp_scripts->registered[$handle] ?? null; if (!$script_obj || !$script_obj->src || strpos($script_obj->src, '.js') === false) continue; if (!empty($script_obj->extra['group']) && $script_obj->extra['group'] === 1) continue;
+                $script_obj = $wp_scripts->registered[$handle] ?? null; if (!$script_obj || !$script_obj->src || strpos($script_obj->src, '.js') === false) continue;
+                $script_group = (int) ($script_obj->extra['group'] ?? 0);
+                if ($script_group !== 1) continue;
+                $script_deps = is_array($script_obj->deps ?? null) ? $script_obj->deps : [];
+                if (array_intersect($script_deps, ['jquery', 'jquery-core', 'jquery-migrate'])) continue;
+                $has_inline_payload = !empty($script_obj->extra['before']) || !empty($script_obj->extra['after']) || !empty($script_obj->extra['data']);
+                if ($has_inline_payload) continue;
                 if (wpso_should_skip_js_combine($script_obj->src, $handle)) continue;
                 $resolved_path = wpso_resolve_url($script_obj->src);
                 $assets_data_js[$handle] = ['ver' => $script_obj->ver, 'path' => (filter_var($resolved_path, FILTER_VALIDATE_URL) ? null : $resolved_path), 'src' => $script_obj->src];
