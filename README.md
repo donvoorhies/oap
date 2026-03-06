@@ -3,15 +3,11 @@
 
 An "anthology" of (IMO) some snazzy Wordpress function-codes that I've come across over time, which I (earlier) used to optimize Wordpress-installations with.
 
-The following functions, which this plugin quietly performs, are (as of v.2.0.0, 14/05/2025):
-* Removes emoji scripts/styles
+The following functions are currently provided by this plugin:
 * Disables embeds
 * Strips query strings from static resources
 * Removes WordPress version from head
-* Inlines above-the-fold critical CSS (filter: `wpso_critical_css`)
-* Defers non-essential JS for faster first paint
 * Removes wp-version number params from scripts and styles
-* Removes Google Fonts (for most themes/plugins)
 * Prevents SSL test on xmlrpc.php
 * Removes version info from feeds
 * Removes unnecessary header info (RSD, wlwmanifest, shortlink, REST, feeds, adjacent posts)
@@ -20,16 +16,12 @@ The following functions, which this plugin quietly performs, are (as of v.2.0.0,
 * Removes extra CSS from Recent Comments widget
 * Minifies CSS & JS (production-grade)
 * Combines CSS & JS (production-grade)
-* Adds <preconnect> for user-specified origins
-* Adds <preload> for user-specified assets
 * Heartbeat API control (normal/throttle/disable)
 * Minimalist settings page for toggling features
-* Global and per-page critical CSS UI
-* Auto-generates critical CSS using Node.js 'critical' if available (prototype/experimental)
-* Optionally moves all CSS files to the footer (experimental, may cause FOUC)
 * Optionally minifies HTML output (experimental)
-* Toggle to allow or block Google Fonts for privacy & speed
-* Optionally moves all JavaScript files to the footer (experimental, may break some plugins/themes)
+
+Compatibility note:
+If you run this plugin together with `critical-path-css-v2`, overlapping frontend optimization features are intentionally removed from OAP to avoid conflicts.
 
 
 Installation:
@@ -44,8 +36,6 @@ You can install this plugin via the WordPress admin panel.
 
 Configuration:
 Go to “Settings > WP Speed Optimizer” for the configuration of the plugin and it's optional functionalities.
-
-N.B.: Use a tool-page as https://w3speedup.com/tools/critical-css-generator/ (or similar) to generate the critical CSS to insert in the setting's field for this setting.
 
 
 Credits:

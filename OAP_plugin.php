@@ -73,16 +73,9 @@ function wpso_admin_init_setup() {
     $fields = [
         ['id' => 'minify', 'title' => __('Minify CSS & JS', 'wpso'), 'callback' => 'wpso_field_minify', 'description' => __('Basic minification for CSS & JS. (Prototype)', 'wpso')],
         ['id' => 'combine', 'title' => __('Combine CSS & JS', 'wpso'), 'callback' => 'wpso_field_combine', 'description' => __('Combines multiple CSS/JS files. Requires file caching to be effective. (Prototype)', 'wpso')],
-        ['id' => 'preconnect', 'title' => __('Preconnect Origins', 'wpso'), 'callback' => 'wpso_field_preconnect', 'description' => __('Enter domains to preconnect to, comma-separated (e.g., https://fonts.gstatic.com).', 'wpso')],
-        ['id' => 'preload', 'title' => __('Preload Critical Assets', 'wpso'), 'callback' => 'wpso_field_preload', 'description' => __('Enter full paths or URLs to assets to preload, comma-separated. Use with care.', 'wpso')],
         ['id' => 'heartbeat', 'title' => __('Control Heartbeat API', 'wpso'), 'callback' => 'wpso_field_heartbeat', 'description' => __('Control the WordPress Heartbeat API in the admin area. (Prototype)', 'wpso')],
         ['id' => 'perpage', 'title' => __('Disable Assets Per Page', 'wpso'), 'callback' => 'wpso_field_perpage', 'description' => __('Feature coming soon.', 'wpso')],
-        ['id' => 'critical_css', 'title' => __('Global Critical CSS', 'wpso'), 'callback' => 'wpso_field_critical_css', 'description' => __('This CSS will be inlined on all pages unless overridden by per-page critical CSS.', 'wpso')],
-        ['id' => 'critical_css_autogenerate', 'title' => __('Auto-generate Critical CSS', 'wpso'), 'callback' => 'wpso_field_critical_css_autogenerate', 'description' => __('Enable auto-generation of critical CSS for posts/pages on save (requires server-side tool).', 'wpso')],
-        ['id' => 'move_css_footer', 'title' => __('Move CSS to Footer', 'wpso'), 'callback' => 'wpso_field_move_css_footer', 'description' => __('<strong>Warning (Experimental):</strong> Moves most CSS files to the footer. Can cause Flash of Unstyled Content (FOUC) and break styles. Test thoroughly. Use with Critical CSS.', 'wpso'), 'is_experimental' => true],
         ['id' => 'minify_html', 'title' => __('Minify HTML Output', 'wpso'), 'callback' => 'wpso_field_minify_html', 'description' => __('<strong>Warning (Experimental):</strong> Aggressively removes whitespace from HTML. Can break complex HTML or inline scripts. Test carefully.', 'wpso'), 'is_experimental' => true],
-        ['id' => 'move_js_footer', 'title' => __('Move JavaScript to Footer', 'wpso'), 'callback' => 'wpso_field_move_js_footer', 'description' => __('<strong>Warning (Experimental):</strong> Moves most JavaScript to the footer. Can break plugins/themes if scripts expect to be in <code>&lt;head&gt;</code>. Essential scripts (like jQuery) are typically excluded. Test extensively.', 'wpso'), 'is_experimental' => true],
-        ['id' => 'allow_google_fonts', 'title' => __('Allow Google Fonts', 'wpso'), 'callback' => 'wpso_field_allow_google_fonts', 'description' => __('Uncheck to attempt removal of enqueued Google Fonts for privacy/speed.', 'wpso')],
     ];
 
     foreach ($fields as $field) {
@@ -94,28 +87,19 @@ add_action('admin_init', 'wpso_admin_init_setup');
 /**
  * Sanitizes plugin options upon saving.
  *
- * Clears critical tool status transient to force a re-check.
- *
  * @since 1.5.0 (Refactored in 2.0.0)
  * @param array $input The input options array from the settings page.
  * @return array The sanitized options array.
  */
 function wpso_sanitize_options($input) {
     $sanitized_input = [];
-    $checkboxes = ['minify', 'combine', 'move_css_footer', 'minify_html', 'allow_google_fonts', 'move_js_footer', 'critical_css_autogenerate'];
+    $checkboxes = ['minify', 'combine', 'minify_html'];
     foreach ($checkboxes as $cb) {
         $sanitized_input[$cb] = isset($input[$cb]) && $input[$cb] == 1 ? 1 : 0;
     }
 
-    if (isset($input['preconnect'])) { $sanitized_input['preconnect'] = sanitize_text_field($input['preconnect']); }
-    if (isset($input['preload'])) { $sanitized_input['preload'] = sanitize_text_field($input['preload']); } // Assuming comma-separated list of URLs/paths
     if (isset($input['heartbeat'])) { $sanitized_input['heartbeat'] = in_array($input['heartbeat'], ['normal', 'throttle', 'disable'], true) ? $input['heartbeat'] : 'normal'; }
-    
-    if (isset($input['critical_css'])) {
-        $sanitized_input['critical_css'] = wp_kses_post(trim($input['critical_css']));
-    }
 
-    delete_transient('wpso_critical_tool_status');
     // wpso_reset_options_cache(); // Consider if explicit reset of static options cache is needed here.
     return $sanitized_input;
 }
@@ -157,38 +141,12 @@ function wpso_render_settings_page() {
     echo '</form></div>';
 }
 
-/**
- * Renders the checkbox field for critical CSS auto-generation.
- * @since 2.0.0
- */
-function wpso_field_critical_css_autogenerate() {
-    $opts = wpso_get_options();
-    echo '<input type="checkbox" name="wpso_options[critical_css_autogenerate]" value="1" ' . checked(1, $opts['critical_css_autogenerate'] ?? 0, false) . ' /> ';
-    echo esc_html__('Enable auto-generation of critical CSS on save.', 'wpso');
-    
-    $critical_status = _wpso_get_critical_command_status();
-    $status_message = '';
-    switch ($critical_status['status']) {
-        case 'available': $status_message = '<span style="color:green;">' . sprintf(esc_html__('Tool available: %s', 'wpso'), '<code>' . esc_html($critical_status['path']) . '</code>') . '</span>'; break;
-        case 'no_command': $status_message = '<span style="color:red;">' . esc_html__('Tool (\'critical\') not found.', 'wpso') . '</span>'; break;
-        case 'no_shell_exec': $status_message = '<span style="color:red;">' . esc_html__('PHP functions `shell_exec` or `exec` are disabled.', 'wpso') . '</span>'; break;
-        default: $status_message = '<span style="color:orange;">' . esc_html__('Tool status unknown.', 'wpso') . '</span>'; break;
-    }
-    echo '<p><small>' . esc_html__('Status:', 'wpso') . ' ' . $status_message . '</small></p>'; // $status_message contains HTML, so not escaped here.
-}
-
 // Standard field renderers with improved readability and descriptions via $args
 function wpso_field_minify($args) { $opts = wpso_get_options(); echo '<input type="checkbox" name="wpso_options[minify]" value="1" '.checked(1, $opts['minify'] ?? 0, false).' /> '.esc_html__('Minify CSS & JS.', 'wpso').'<p><small>'.esc_html($args['description']).'</small></p>'; }
 function wpso_field_combine($args) { $opts = wpso_get_options(); echo '<input type="checkbox" name="wpso_options[combine]" value="1" '.checked(1, $opts['combine'] ?? 0, false).' /> '.esc_html__('Combine CSS & JS.', 'wpso').'<p><small>'.esc_html($args['description']).'</small></p>'; }
-function wpso_field_preconnect($args) { $opts = wpso_get_options(); echo '<input type="text" name="wpso_options[preconnect]" value="'.esc_attr($opts['preconnect'] ?? '').'" size="50" placeholder="e.g. https://fonts.gstatic.com, https://cdn.example.com" /><p><small>'.esc_html($args['description']).'</small></p>'; }
-function wpso_field_preload($args) { $opts = wpso_get_options(); echo '<input type="text" name="wpso_options[preload]" value="'.esc_attr($opts['preload'] ?? '').'" size="50" placeholder="e.g. /wp-content/themes/yourtheme/hero.jpg" /><p><small>'.esc_html($args['description']).'</small></p>'; }
 function wpso_field_heartbeat($args) { $opts = wpso_get_options(); echo '<select name="wpso_options[heartbeat]"><option value="normal" '.selected($opts['heartbeat'] ?? 'normal', 'normal', false).'>'.esc_html__('Normal', 'wpso').'</option><option value="throttle" '.selected($opts['heartbeat'] ?? 'normal', 'throttle', false).'>'.esc_html__('Throttle (60s)', 'wpso').'</option><option value="disable" '.selected($opts['heartbeat'] ?? 'normal', 'disable', false).'>'.esc_html__('Disable in Admin', 'wpso').'</option></select><p><small>'.esc_html($args['description']).'</small></p>'; }
 function wpso_field_perpage($args) { echo '<em>'.esc_html__('Coming soon: UI for per-page asset disabling!', 'wpso').'</em><p><small>'.esc_html($args['description']).'</small></p>'; }
-function wpso_field_critical_css($args) { $opts = wpso_get_options(); echo '<textarea name="wpso_options[critical_css]" rows="6" cols="60" placeholder="'.esc_attr__('Paste your above-the-fold CSS here', 'wpso').'">'.esc_textarea($opts['critical_css'] ?? '').'</textarea><p><small>'.esc_html($args['description']).'</small></p>'; }
-function wpso_field_move_css_footer($args) { $opts = wpso_get_options(); echo '<input type="checkbox" name="wpso_options[move_css_footer]" value="1" '.checked(1, $opts['move_css_footer'] ?? 0, false).' /> '.esc_html__('Move most CSS files to the footer.', 'wpso').'<p><small>'.wp_kses_post($args['description']).'</small></p>'; }
 function wpso_field_minify_html($args) { $opts = wpso_get_options(); echo '<input type="checkbox" name="wpso_options[minify_html]" value="1" '.checked(1, $opts['minify_html'] ?? 0, false).' /> '.esc_html__('Minify HTML output.', 'wpso').'<p><small>'.wp_kses_post($args['description']).'</small></p>'; }
-function wpso_field_allow_google_fonts($args) { $opts = wpso_get_options(); echo '<input type="checkbox" name="wpso_options[allow_google_fonts]" value="1" '.checked(1, $opts['allow_google_fonts'] ?? 1, false).' /> '.esc_html__('Allow Google Fonts.', 'wpso').'<p><small>'.esc_html($args['description']).'</small></p>'; }
-function wpso_field_move_js_footer($args) { $opts = wpso_get_options(); echo '<input type="checkbox" name="wpso_options[move_js_footer]" value="1" '.checked(1, $opts['move_js_footer'] ?? 0, false).' /> '.esc_html__('Move most JavaScript files to the footer.', 'wpso').'<p><small>'.wp_kses_post($args['description']).'</small></p>'; }
 
 
 // --- Frontend Optimization Registration --- //
@@ -205,14 +163,27 @@ add_action('wp', function() {
     }
 });
 
-// (Helper functions: _wpso_remove_version_query_arg, wpso_setup_cache_dir, _wpso_generate_cache_key, _wpso_get_critical_command_status, wpso_critical_css_admin_notice, wpso_dismiss_admin_notice_handler - remain as before, ensure PHPDocs added if missing)
+// (Helper functions: _wpso_remove_version_query_arg, wpso_setup_cache_dir, _wpso_generate_cache_key - remain as before, ensure PHPDocs added if missing)
 /**
  * Removes version query arguments from script and style URLs.
  * @since 1.2.0
  * @param string $src The source URL.
  * @return string The URL without the 'ver' query argument.
  */
-function _wpso_remove_version_query_arg($src) { if (strpos($src, 'ver=') !== false) { $src = remove_query_arg('ver', $src); } return $src; }
+function _wpso_remove_version_query_arg($src) {
+    if (!is_string($src) || $src === '') {
+        return $src;
+    }
+    $parts = wp_parse_url($src);
+    if (empty($parts['path'])) {
+        return $src;
+    }
+    $ext = strtolower(pathinfo($parts['path'], PATHINFO_EXTENSION));
+    if (in_array($ext, ['css', 'js'], true) && strpos($src, '?') !== false) {
+        $src = strtok($src, '?');
+    }
+    return $src;
+}
 
 /**
  * Sets up the cache directory, ensuring it exists and is writable.
@@ -232,26 +203,6 @@ function wpso_setup_cache_dir() { $cache_dir = WPSO_CACHE_DIR; if (!is_dir($cach
 function _wpso_generate_cache_key($assets_data, $type = 'css') { $key_string = ''; foreach ($assets_data as $h => $d) { $key_string.=$h.($d['ver']??'0'); if(isset($d['path'])&&file_exists($d['path'])){$key_string.=filemtime($d['path']);}} return md5($key_string.$type.get_bloginfo('version'));}
 
 /**
- * Checks and caches the status of the 'critical' command-line tool.
- * @since 2.1.0
- * @return array Status array with 'status', 'path', and 'message'.
- */
-function _wpso_get_critical_command_status() { $status=get_transient('wpso_critical_tool_status'); if(false===$status){ if(!function_exists('shell_exec')||!function_exists('exec')||in_array('shell_exec',array_map('trim',explode(',',ini_get('disable_functions'))))||in_array('exec',array_map('trim',explode(',',ini_get('disable_functions'))))){$status=['status'=>'no_shell_exec','path'=>'','message'=>'PHP functions shell_exec or exec are disabled.'];}else{$path=shell_exec('command -v critical 2>/dev/null'); if(!empty($path)){$status=['status'=>'available','path'=>trim($path),'message'=>'Critical tool found at: '.trim($path)];}else{$status=['status'=>'no_command','path'=>'','message'=>'The "critical" command was not found in the server\'s PATH.'];}}set_transient('wpso_critical_tool_status',$status,DAY_IN_SECONDS);} return $status;}
-
-/**
- * Displays an admin notice if the critical CSS auto-generation tool is not available.
- * @since 2.1.0
- */
-add_action('admin_notices','wpso_critical_css_admin_notice'); function wpso_critical_css_admin_notice(){ if(!current_user_can('manage_options'))return; $user_id=get_current_user_id(); $status=_wpso_get_critical_command_status(); $dismiss_key='wpso_critical_status_notice_dismissed_'.substr(md5($status['status']),0,10); if(get_user_meta($user_id,$dismiss_key,true))return; if($status['status']==='available')return; $message='<strong>WP Speed Optimizer:</strong> Critical CSS auto-generation feature '; if($status['status']==='no_shell_exec'){$message.='is unavailable because PHP functions <code>shell_exec</code> or <code>exec</code> are disabled on your server.';}elseif($status['status']==='no_command'){$message.='may not work because the "critical" command-line tool could not be found in your server\'s PATH.';}else{return;} $message.=' Please consult the plugin documentation or your hosting provider for assistance if you wish to use this feature.'; $dismiss_url=wp_nonce_url(add_query_arg(['wpso_dismiss_notice'=>'critical_status','notice_id'=>$dismiss_key]),'wpso_dismiss_notice_action','_wpso_dismiss_nonce'); echo '<div class="notice notice-warning is-dismissible"><p>'.wp_kses_post($message).'</p><p><a href="'.esc_url($dismiss_url).'">'.__('Dismiss this notice','wpso').'</a></p></div>';}
-
-/**
- * Handles the dismissal of the critical CSS status admin notice.
- * @since 2.1.0
- */
-add_action('admin_init','wpso_dismiss_admin_notice_handler'); function wpso_dismiss_admin_notice_handler(){ if(isset($_GET['wpso_dismiss_notice'],$_GET['_wpso_dismiss_nonce'],$_GET['notice_id'])){if(!wp_verify_nonce(sanitize_key($_GET['_wpso_dismiss_nonce']),'wpso_dismiss_notice_action')){wp_die(__('Security check failed.','wpso'));} $user_id=get_current_user_id(); $notice_id=sanitize_key($_GET['notice_id']); if($user_id){$expected_dismiss_key='wpso_critical_status_notice_dismissed_'.substr(md5(_wpso_get_critical_command_status()['status']),0,10); if($notice_id===$expected_dismiss_key){update_user_meta($user_id,$notice_id,true);}} wp_redirect(remove_query_arg(['wpso_dismiss_notice','_wpso_dismiss_nonce','notice_id'])); exit;}}}
-
-
-/**
  * Main function to register and apply frontend optimizations.
  *
  * This function is hooked into 'wp' and checks various plugin options
@@ -264,40 +215,17 @@ function wpso_register_optimizations() {
 
     // --- Core Optimizations (Emoji, oEmbed, Version Strings, Generator Tag) ---
     // These are generally considered safe and foundational.
-    add_action('init', function() { remove_action('wp_head', 'print_emoji_detection_script', 7); remove_action('wp_print_styles', 'print_emoji_styles'); remove_action('admin_print_scripts', 'print_emoji_detection_script'); remove_action('admin_print_styles', 'print_emoji_styles'); });
     add_action('init', function() { remove_action('rest_api_init', 'wp_oembed_register_route'); remove_filter('oembed_dataparse', 'wp_filter_oembed_result', 10); remove_action('wp_head', 'wp_oembed_add_discovery_links'); remove_action('wp_head', 'wp_oembed_add_host_js'); remove_filter('embed_handler_html', '__return_false'); add_filter('embed_oembed_discover', '__return_false'); remove_filter('pre_oembed_result', 'wp_filter_pre_oembed_result', 10); });
     add_filter('script_loader_src', '_wpso_remove_version_query_arg', 15); 
     add_filter('style_loader_src', '_wpso_remove_version_query_arg', 15); 
     remove_action('wp_head', 'wp_generator');
     
-    // --- Defer Non-Essential JavaScript ---
-    // Uses a filterable list of handles to skip.
-    add_filter('script_loader_tag', function($tag, $handle) use ($opts) { 
-        $skip_defer = ['jquery', 'jquery-core', 'jquery-migrate', 'wp-polyfill', 'wp-hooks', 'wp-i18n', 'contact-form-7', 'wpcf7-recaptcha', 'easy-wp-smtp-script']; 
-        $skip_defer = apply_filters('wpso_defer_skip_handles', $skip_defer); 
-        if (in_array($handle, $skip_defer, true)) return $tag; 
-        if (strpos($tag, ' defer') === false && preg_match('/<script[^>]*src=["\'][^"\']*\.js["\'][^>]*>/', $tag)) { 
-            $tag = str_replace(' async', '', $tag); // Remove async if present, as defer is preferred with ordered execution
-            $tag = str_replace('<script ', '<script defer ', $tag); 
-        } 
-        return $tag; 
-    }, 10, 2); // Default priority 10, 2 arguments.
-    
-    // --- Google Fonts Removal (if option selected) ---
-    add_action('wp_enqueue_scripts', function() use ($opts) { 
-        if (!empty($opts['allow_google_fonts'])) return; 
-        global $wp_styles, $wp_scripts; 
-        $fonts_to_remove = wpso_detect_google_fonts(); 
-        foreach ($fonts_to_remove as $font) { 
-            if ($font['type'] === 'style') { wp_dequeue_style($font['handle']); wp_deregister_style($font['handle']); } 
-            elseif ($font['type'] === 'script') { wp_dequeue_script($font['handle']); wp_deregister_script($font['handle']); } 
-        } 
-    }, 100); // Late enough to catch most enqueues.
-    
     // --- Other General Header/Feed Cleanup ---
     add_filter('the_generator', '__return_empty_string'); 
+    add_filter('https_local_ssl_verify', '__return_false');
     remove_action('wp_head', 'rsd_link'); remove_action('wp_head', 'wlwmanifest_link'); remove_action('wp_head', 'wp_shortlink_wp_head'); remove_action('wp_head', 'rest_output_link_wp_head'); remove_action('wp_head', 'feed_links_extra', 3); remove_action('wp_head', 'feed_links', 2); remove_action('wp_head', 'adjacent_posts_rel_link_wp_head', 10);
     add_filter('xmlrpc_methods', function($methods) { unset($methods['pingback.ping'], $methods['pingback.extensions.getPingbacks']); return $methods; }); 
+    add_filter('pings_open', '__return_false', 20, 2);
     add_filter('wp_headers', function($headers) { unset($headers['X-Pingback']); return $headers; }); 
     add_action('pre_ping', function(&$links) { $links = array(); }); // Disable pingbacks globally
     add_action('pre_ping', function(&$links) { foreach ($links as $l => $link) { if (0 === strpos($link, get_option('home'))) unset($links[$l]); } }); // Disable self-pingbacks
@@ -390,35 +318,9 @@ function wpso_register_optimizations() {
         }
     }, 999); // Priority 999: Runs after most scripts are enqueued.
 
-    // Preconnect & Preload
-    add_action('wp_head', function() use ($opts) { if(!empty($opts['preconnect'])){$origins=array_map('trim',explode(',',$opts['preconnect'])); foreach($origins as $o){if(filter_var($o,FILTER_VALIDATE_URL))echo '<link rel="preconnect" href="'.esc_url($o).'" crossorigin />'."\n";}} if(!empty($opts['preload'])){$assets=array_map('trim',explode(',',$opts['preload'])); foreach($assets as $asset_url){if($asset_url){$as='auto'; $path=wp_parse_url($asset_url,PHP_URL_PATH); $ext=''; if($path){$ext=strtolower(pathinfo($path,PATHINFO_EXTENSION));} if($ext){switch($ext){case 'js':$as='script';break; case 'css':$as='style';break; case 'woff':case 'woff2':case 'ttf':case 'otf':case 'eot':case 'webfont':$as='font';break; case 'jpg':case 'jpeg':case 'png':case 'gif':case 'webp':case 'svg':case 'avif':$as='image';break;}} $crossorigin=($as==='font')?' crossorigin':''; echo '<link rel="preload" href="'.esc_url($asset_url).'" as="'.esc_attr($as).'"'.$crossorigin.' />'."\n";}}} }, 2);
-    
     // Heartbeat
     add_filter('heartbeat_settings', function($settings) use ($opts) { if(!is_admin())return $settings; $hb_setting=$opts['heartbeat']??'normal'; if($hb_setting==='throttle')$settings['interval']=60; elseif($hb_setting==='disable')$settings['interval']=600; return $settings;});
     add_action('init', function() use ($opts) { if(is_admin()&&!empty($opts['heartbeat'])&&$opts['heartbeat']==='disable')wp_deregister_script('heartbeat');});
-    
-    // Critical CSS
-    add_action('add_meta_boxes',function(){$screens=['post','page']; $screens=apply_filters('wpso_critical_css_metabox_screens',$screens); foreach($screens as $s){add_meta_box('wpso_critical_css','WP Speed Optimizer: Critical CSS','wpso_perpage_critical_css_metabox',$s,'side','default');}});
-    add_action('save_post',function($post_id){if(!isset($_POST['wpso_critical_css_nonce'])||!wp_verify_nonce($_POST['wpso_critical_css_nonce'],'wpso_save_critical_css'))return; if(defined('DOING_AUTOSAVE')&&DOING_AUTOSAVE)return; if(!current_user_can(($_POST['post_type']==='page'?'edit_page':'edit_post'),$post_id))return; if(isset($_POST['wpso_critical_css'])){$css=wp_kses_post(trim($_POST['wpso_critical_css'])); update_post_meta($post_id,'_wpso_critical_css',$css);}else{delete_post_meta($post_id,'_wpso_critical_css');}},10,1);
-    add_action('wp_head',function() use ($opts){$out_css=''; if(is_singular()){$pid=get_queried_object_id(); $page_css=get_post_meta($pid,'_wpso_critical_css',true); if($page_css)$out_css=$page_css;} if(empty($out_css)&&!empty($opts['critical_css']))$out_css=$opts['critical_css']; $out_css=apply_filters('wpso_critical_css',$out_css); if($out_css)echo "<style id='wpso-critical-css'>\n".$out_css."\n</style>\n";},1); // Priority 1 for critical CSS
-    
-    // Auto-generate Critical CSS (Timeout: 30000ms = 30s)
-    add_action('save_post',function($post_id) use ($opts){if(empty($opts['critical_css_autogenerate']))return; if(wp_is_post_revision($post_id)||get_post_status($post_id)!=='publish'||get_post_meta($post_id,'_wpso_critical_css',true))return; $crit_stat=_wpso_get_critical_command_status(); if($crit_stat['status']!=='available'){error_log('WPSO: CritCSS auto-gen skip: '.$crit_stat['message']);return;} $cmd_path=$crit_stat['path']; $url=get_permalink($post_id); if(!$url||is_wp_error($url)||!filter_var($url,FILTER_VALIDATE_URL))return; $out_file=sys_get_temp_dir().'/wpso_critical_'.$post_id.'_'.wp_generate_password(12,false).'.css'; $cmd=escapeshellcmd($cmd_path).' --minify --width 1300 --height 900 '.escapeshellarg($url).' --extract --inline false --timeout 30000 --output '.escapeshellarg($out_file).' 2>&1'; $output=[]; $ret=0; @exec($cmd,$output,$ret); if($ret===0&&file_exists($out_file)){$css=file_get_contents($out_file); if($css){$css=wp_kses_post(trim($css));update_post_meta($post_id,'_wpso_critical_css',$css);} @unlink($out_file);}else{error_log("WPSO CritCSS Fail.\nURL:".$url."\nCMD:".$cmd."\nRC:".$ret."\nOutput:".implode("\n",$output));}},20,1); // Priority 20, after manual save.
-
-    // --- Experimental Feature: Move CSS to Footer ---
-    if(!empty($opts['move_css_footer'])){
-        add_action('wp_enqueue_scripts',function()use($opts){
-            if(is_admin())return; global $wp_styles; if(!($wp_styles instanceof WP_Styles)){error_log('WPSO: WP_Styles N/A for move CSS.');return;}
-            $skip=['admin-bar','dashicons','wpso-critical-css']; // Critical CSS must stay in head
-            $skip=apply_filters('wpso_move_css_footer_skip_handles',$skip);
-            foreach($wp_styles->queue as $h){
-                if(in_array($h,$skip,true))continue;
-                if(isset($wp_styles->groups[$h])&&$wp_styles->groups[$h]===1)continue; // Already in footer
-                if($wp_styles->get_data($h,'group')===1)continue; // Already in footer by add_data
-                $wp_styles->add_data($h,'group',1);
-            }
-        },1001); // Priority 1001: After most styles are enqueued.
-    }
 
     // --- Experimental Feature: Minify HTML Output ---
     if(!empty($opts['minify_html'])){
@@ -428,20 +330,6 @@ function wpso_register_optimizations() {
             if(ob_get_level()>0&&!empty($handlers)){error_log('WPSO: HTML minify OB conflict warning. Active: '.implode(',',$handlers));}
             ob_start('wpso_minify_html_buffer');
         },0); // Priority 0: Very early on template_redirect.
-    }
-
-    // --- Experimental Feature: Move JavaScript to Footer ---
-    if(!empty($opts['move_js_footer'])){
-        add_action('wp_enqueue_scripts',function()use($opts){
-            if(is_admin())return; global $wp_scripts; if(!($wp_scripts instanceof WP_Scripts)){error_log('WPSO: WP_Scripts N/A for move JS.');return;}
-            $skip=['jquery','jquery-core','jquery-migrate','wp-polyfill','wp-hooks','wp-i18n','wp-api-fetch','wp-url','contact-form-7','woocommerce']; // Default essential scripts
-            $skip=apply_filters('wpso_move_js_footer_skip_handles',$skip);
-            foreach($wp_scripts->queue as $h){
-                if(in_array($h,$skip,true))continue;
-                if($wp_scripts->get_data($h,'group')===1)continue; // Already in footer
-                if(isset($wp_scripts->registered[$h])&&$wp_scripts->registered[$h]->src){$wp_scripts->add_data($h,'group',1);}
-            }
-        },1002); // Priority 1002: After most scripts, and after move_css_footer.
     }
 
 } // End of wpso_register_optimizations

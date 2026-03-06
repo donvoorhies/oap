@@ -18,16 +18,12 @@ body,html{height:100%;margin:0}body{font:16px Helvetica,Arial,Sans-Serif,Serif}m
 <h3>"Don's Optimization Anthology Plugin" (abbrev.: OAP)</h3>
 <p>An <i>"anthology"</i> of (IMO) some snazzy Wordpress function-codes that I've come across over time, which I (earlier) used to optimize Wordpress-installations with.</p>
 
-<p>The following functions, which this plugin quietly performs, are (as of v.2.0.0, 14/05/2025):</p>
+<p>The following functions are currently provided by this plugin:</p>
 <ul>
-<li>Removes emoji scripts/styles</li>
 <li>Disables embeds</li>
 <li>Strips query strings from static resources</li>
 <li>Removes WordPress version from head</li>
-<li>Inlines above-the-fold critical CSS (filter: wpso_critical_css)</li>
-<li>Defers non-essential JS for faster first paint</li>
 <li>Removes wp-version number params from scripts and styles</li>
-<li>Removes Google Fonts (for most themes/plugins)</li>
 <li>Prevents SSL test on xmlrpc.php</li>
 <li>Removes version info from feeds</li>
 <li>Removes unnecessary header info (RSD, wlwmanifest, shortlink, REST, feeds, adjacent posts)</li>
@@ -36,16 +32,11 @@ body,html{height:100%;margin:0}body{font:16px Helvetica,Arial,Sans-Serif,Serif}m
 <li>Removes extra CSS from Recent Comments widget</li>
 <li>Minifies CSS & JS (production-grade)</li>
 <li>Combines CSS & JS (production-grade)</li>
-<li>Adds for user-specified origins</li>
-<li>Adds for user-specified assets</li>
 <li>Heartbeat API control (normal/throttle/disable)</li>
 <li>Minimalist settings page for toggling features</li>
-<li>Global and per-page critical CSS UI</li>
-<li>Optionally moves all CSS files to the footer (experimental, may cause FOUC)</li>
 <li>Optionally minifies HTML output (experimental)</li>
-<li>Toggle to allow or block Google Fonts for privacy & speed</li>
-<li>Optionally moves all JavaScript files to the footer (experimental, may break some plugins/themes)</li>
 </ul>
+<p><strong>Compatibility note:</strong> If you run this plugin together with <code>critical-path-css-v2</code>, overlapping frontend optimization features are intentionally removed from OAP to avoid conflicts.</p>
 </article>
 
 <article>
@@ -62,7 +53,7 @@ body,html{height:100%;margin:0}body{font:16px Helvetica,Arial,Sans-Serif,Serif}m
 <article>
 <h2>Configuration:</h2>
 <p>Go to “Settings &gt; WP Speed Optimizer” for the configuration of the plugin and it's optional functionalities.<br>
-N.B.: Use a tool-page as <a href="https://w3speedup.com/tools/critical-css-generator/" target="_blank">https://w3speedup.com/tools/critical-css-generator/</a> (or similar) to generate the critical CSS to insert in the setting's field for this setting.</p>
+</p>
 </article>
 <article>
 <h2>Credits:</h2>
