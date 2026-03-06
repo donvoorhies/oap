@@ -232,6 +232,74 @@ add_action('wp', function() {
     }
 });
 
+/**
+ * Ensures jQuery is loaded before scripts that contain inline jQuery payloads.
+ *
+ * Some themes/plugins attach inline "after" scripts that call jQuery without
+ * declaring `jquery` as an explicit dependency, which can cause runtime errors.
+ *
+ * @since 2.0.3
+ * @return void
+ */
+function wpso_enforce_jquery_dependency_for_inline_scripts() {
+    if (is_admin()) {
+        return;
+    }
+
+    global $wp_scripts;
+    if (!($wp_scripts instanceof WP_Scripts) || empty($wp_scripts->queue)) {
+        return;
+    }
+
+    $needs_jquery = false;
+
+    foreach ($wp_scripts->queue as $handle) {
+        $script_obj = $wp_scripts->registered[$handle] ?? null;
+        if (!$script_obj) {
+            continue;
+        }
+
+        $extra = is_array($script_obj->extra ?? null) ? $script_obj->extra : [];
+        $inline_parts = [];
+        foreach (['before', 'after', 'data'] as $key) {
+            if (!empty($extra[$key])) {
+                if (is_array($extra[$key])) {
+                    $inline_parts[] = implode("\n", $extra[$key]);
+                } else {
+                    $inline_parts[] = (string) $extra[$key];
+                }
+            }
+        }
+
+        if (empty($inline_parts)) {
+            continue;
+        }
+
+        $inline_blob = implode("\n", $inline_parts);
+        if (!preg_match('/\bjQuery\b/', $inline_blob)) {
+            continue;
+        }
+
+        if (!is_array($script_obj->deps)) {
+            $script_obj->deps = [];
+        }
+
+        if (!in_array('jquery', $script_obj->deps, true) && !in_array('jquery-core', $script_obj->deps, true)) {
+            $script_obj->deps[] = 'jquery';
+            $wp_scripts->registered[$handle] = $script_obj;
+            wpso_debug_log('Injected jquery dependency for handle: ' . $handle);
+        }
+
+        $needs_jquery = true;
+    }
+
+    if ($needs_jquery) {
+        wp_enqueue_script('jquery');
+        wpso_debug_log('Enqueued jquery due to inline jQuery payload detection.');
+    }
+}
+add_action('wp_enqueue_scripts', 'wpso_enforce_jquery_dependency_for_inline_scripts', 1);
+
 // (Helper functions: _wpso_remove_version_query_arg, wpso_setup_cache_dir, _wpso_generate_cache_key - remain as before, ensure PHPDocs added if missing)
 /**
  * Removes version query arguments from script and style URLs.
