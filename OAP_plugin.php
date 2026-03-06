@@ -597,8 +597,8 @@ function wpso_output_push_prompt_contrast_css() {
     echo '[id*="notification-prompt" i]';
     echo '{color:#111 !important;}';
 
-    echo '.pn-wrapper{background:#fff !important;color:#111 !important;}';
-    echo '.pn-wrapper *{color:#111 !important;}';
+    echo '.pn-wrapper{background:linear-gradient(180deg,#000,#333) !important;color:#fff !important;}';
+    echo '.pn-wrapper *{color:#fff !important;}';
 
     echo '.pn-wrapper button,';
     echo '.onesignal-slidedown-container button,';
@@ -611,7 +611,7 @@ function wpso_output_push_prompt_contrast_css() {
     echo '[id*="push-notification" i] button,';
     echo '[class*="notification-prompt" i] button,';
     echo '[id*="notification-prompt" i] button';
-    echo '{color:#111 !important;}';
+    echo '{color:#fff !important;}';
 
     echo '.onesignal-slidedown-container .onesignal-popover-button.primary,';
     echo '.onesignal-popover-container .onesignal-popover-button.primary,';
