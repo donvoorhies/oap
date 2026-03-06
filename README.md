@@ -3,6 +3,11 @@
 
 An "anthology" of (IMO) some snazzy Wordpress function-codes that I've come across over time, which I (earlier) used to optimize Wordpress-installations with.
 
+As of v2.0.1, OAP is intended to run side by side with:
+https://github.com/donvoorhies/critical-path-css-v2
+
+Many overlapping frontend optimization functions have been moved there to avoid conflicts between the two plugins.
+
 The following functions are currently provided by this plugin:
 * Disables embeds
 * Strips query strings from static resources
