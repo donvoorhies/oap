@@ -50,6 +50,62 @@ function wpso_get_options() {
     return $wpso_options;
 }
 
+/**
+ * Returns whether OAP debug logging is enabled.
+ *
+ * Enable via wp-config.php: define('WPSO_DEBUG', true);
+ *
+ * @since 2.0.3
+ * @return bool
+ */
+function wpso_debug_enabled() {
+    $enabled = defined('WPSO_DEBUG') && WPSO_DEBUG;
+    return (bool) apply_filters('wpso_debug_enabled', $enabled);
+}
+
+/**
+ * Writes a namespaced debug log entry when debug mode is enabled.
+ *
+ * @since 2.0.3
+ * @param string $message Debug message.
+ * @return void
+ */
+function wpso_debug_log($message) {
+    if (!wpso_debug_enabled()) {
+        return;
+    }
+    error_log('[WPSO DEBUG] ' . $message);
+}
+
+/**
+ * Captures fatal runtime errors at shutdown for easier diagnostics.
+ *
+ * @since 2.0.3
+ * @return void
+ */
+function wpso_debug_shutdown_logger() {
+    if (!wpso_debug_enabled()) {
+        return;
+    }
+    $error = error_get_last();
+    if (!$error || !isset($error['type'])) {
+        return;
+    }
+    $fatal_types = [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR, E_RECOVERABLE_ERROR];
+    if (in_array($error['type'], $fatal_types, true)) {
+        $line = isset($error['line']) ? (int) $error['line'] : 0;
+        $file = isset($error['file']) ? (string) $error['file'] : 'unknown';
+        $msg  = isset($error['message']) ? (string) $error['message'] : 'unknown fatal error';
+        error_log('[WPSO DEBUG][FATAL] ' . $msg . ' in ' . $file . ':' . $line);
+    }
+}
+add_action('plugins_loaded', function() {
+    if (wpso_debug_enabled()) {
+        wpso_debug_log('plugins_loaded');
+    }
+    register_shutdown_function('wpso_debug_shutdown_logger');
+}, 1);
+
 // --- Admin Area Setup: Menu, Settings, Fields --- //
 
 /**
@@ -170,7 +226,9 @@ function wpso_field_minify_html($args) { $opts = wpso_get_options(); echo '<inpu
  */
 add_action('wp', function() {
     if (!is_admin() && !is_customize_preview()) {
+        wpso_debug_log('wp action reached; calling wpso_register_optimizations');
         wpso_register_optimizations();
+        wpso_debug_log('wpso_register_optimizations finished');
     }
 });
 
@@ -216,10 +274,12 @@ function _wpso_generate_cache_key($assets_data, $type = 'css') { $key_string = '
  */
 function wpso_register_optimizations() {
     $opts = wpso_get_options();
+    wpso_debug_log('wpso_register_optimizations entered with options: ' . wp_json_encode($opts));
 
     $has_enabled_runtime_feature = !empty($opts['combine']) || !empty($opts['minify']) || !empty($opts['minify_html']);
     $force_core_optimizations = (bool) apply_filters('wpso_force_core_optimizations', false, $opts);
     if (!$has_enabled_runtime_feature && !$force_core_optimizations) {
+        wpso_debug_log('failsafe early return: no runtime feature enabled and no force override');
         return;
     }
 
