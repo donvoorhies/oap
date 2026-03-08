@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -208,3 +209,272 @@ No major changes implemented (actually none), and now elevated to a fully-fledge
 
 
 
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OAP — Don's Optimization Anthology Plugin</title>
+  <meta name="description" content="A curated anthology of WordPress optimizations. Minify, combine, clean headers, control Heartbeat. Designed to run alongside Critical Path CSS, CCCP, and Flak Jacket." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blue: #0ea5e9; --blue-dim: #0284c7;
+      --black: #07090c; --off-white: #e8edf2; --grey: #6b7a85;
+      --display: 'Space Grotesk', sans-serif;
+      --mono: 'IBM Plex Mono', monospace;
+      --sans: 'IBM Plex Sans', sans-serif;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--black); color: var(--off-white); font-family: var(--sans); font-size: 17px; line-height: 1.65; overflow-x: hidden; }
+
+    /* Diagonal circuit lines */
+    body::before {
+      content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background:
+        repeating-linear-gradient(135deg, transparent, transparent 80px, rgba(14,165,233,0.025) 80px, rgba(14,165,233,0.025) 81px),
+        repeating-linear-gradient(45deg, transparent, transparent 80px, rgba(14,165,233,0.015) 80px, rgba(14,165,233,0.015) 81px);
+    }
+
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; background: rgba(7,9,12,0.9); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(14,165,233,0.2); }
+    .nav-logo { font-family: var(--display); font-size: 1.1rem; font-weight: 700; letter-spacing: 0.06em; color: var(--blue); text-decoration: none; }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a { font-family: var(--mono); font-size: 0.72rem; color: var(--grey); text-decoration: none; letter-spacing: 0.1em; text-transform: uppercase; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--off-white); }
+
+    .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 8rem 2rem 4rem; position: relative; overflow: hidden; max-width: 1000px; margin: 0 auto; }
+    .hero-version { display: inline-flex; align-items: center; gap: 0.5rem; font-family: var(--mono); font-size: 0.68rem; color: var(--grey); letter-spacing: 0.1em; background: rgba(14,165,233,0.08); border: 1px solid rgba(14,165,233,0.2); padding: 0.3rem 0.8rem; border-radius: 2px; margin-bottom: 1.5rem; width: fit-content; opacity: 0; animation: fadeUp 0.6s ease forwards 0.15s; }
+    .hero-version span { color: var(--blue); }
+    .hero-eyebrow { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--blue); margin-bottom: 1.5rem; opacity: 0; animation: fadeUp 0.6s ease forwards 0.25s; }
+    .hero-title { font-family: var(--display); font-weight: 700; font-size: clamp(3.2rem, 10vw, 7.5rem); line-height: 0.92; letter-spacing: -0.01em; color: var(--off-white); opacity: 0; animation: fadeUp 0.7s ease forwards 0.35s; }
+    .hero-title .accent { color: var(--blue); }
+
+    .hero-since { margin-top: 2rem; display: inline-flex; align-items: center; gap: 2rem; opacity: 0; animation: fadeUp 0.7s ease forwards 0.45s; flex-wrap: wrap; }
+    .since-item { text-align: center; }
+    .since-num { font-family: var(--display); font-weight: 700; font-size: 2.4rem; color: var(--blue); line-height: 1; display: block; }
+    .since-label { font-family: var(--mono); font-size: 0.65rem; color: var(--grey); letter-spacing: 0.12em; text-transform: uppercase; }
+    .since-divider { width: 1px; height: 2.5rem; background: rgba(14,165,233,0.25); }
+
+    .hero-sub { margin-top: 2rem; font-size: 1.05rem; color: var(--grey); max-width: 500px; opacity: 0; animation: fadeUp 0.7s ease forwards 0.55s; }
+    .hero-sub em { color: var(--off-white); font-style: normal; }
+    .hero-actions { margin-top: 2.5rem; display: flex; gap: 1rem; flex-wrap: wrap; opacity: 0; animation: fadeUp 0.7s ease forwards 0.65s; }
+
+    .btn { display: inline-flex; align-items: center; gap: 0.5rem; font-family: var(--mono); font-size: 0.78rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; text-decoration: none; padding: 0.85rem 1.75rem; border-radius: 2px; transition: all 0.2s; }
+    .btn-primary { background: var(--blue); color: var(--black); }
+    .btn-primary:hover { background: var(--blue-dim); transform: translateY(-1px); }
+    .btn-ghost { background: transparent; color: var(--off-white); border: 1px solid rgba(232,237,242,0.2); }
+    .btn-ghost:hover { border-color: var(--off-white); transform: translateY(-1px); }
+
+    .hero-bg-text { position: absolute; right: -0.02em; bottom: -0.08em; font-family: var(--display); font-weight: 700; font-size: clamp(10rem, 22vw, 18rem); line-height: 1; color: rgba(14,165,233,0.04); user-select: none; pointer-events: none; letter-spacing: -0.02em; }
+
+    .divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(14,165,233,0.35), transparent); }
+
+    .section-label { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--blue); margin-bottom: 2.5rem; display: flex; align-items: center; gap: 1rem; }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: rgba(14,165,233,0.2); }
+
+    /* Functions grid */
+    .functions { padding: 5rem 2rem; max-width: 1000px; margin: 0 auto; }
+    .fn-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5px; background: rgba(14,165,233,0.1); border: 1px solid rgba(14,165,233,0.1); }
+    .fn-item { background: var(--black); padding: 1.5rem; display: flex; align-items: flex-start; gap: 0.75rem; transition: background 0.2s; }
+    .fn-item:hover { background: rgba(14,165,233,0.04); }
+    .fn-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--blue); flex-shrink: 0; margin-top: 0.55rem; box-shadow: 0 0 6px rgba(14,165,233,0.5); }
+    .fn-text { font-family: var(--mono); font-size: 0.8rem; color: var(--off-white); line-height: 1.5; }
+    .fn-text small { display: block; color: var(--grey); font-size: 0.72rem; margin-top: 0.2rem; }
+
+    /* Compatibility */
+    .compat { padding: 0 2rem; max-width: 1000px; margin: 0 auto; }
+    .compat-inner { padding: 2.5rem; border: 1px solid rgba(14,165,233,0.25); background: rgba(14,165,233,0.04); }
+    .compat-label { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--blue); margin-bottom: 1rem; }
+    .compat p { font-size: 0.95rem; color: var(--grey); max-width: 680px; }
+    .compat p strong { color: var(--off-white); }
+    .compat-plugins { margin-top: 1.2rem; display: flex; gap: 1rem; flex-wrap: wrap; }
+    .compat-tag { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.08em; padding: 0.3rem 0.8rem; border: 1px solid rgba(14,165,233,0.25); color: var(--blue); text-decoration: none; transition: all 0.2s; border-radius: 2px; }
+    .compat-tag:hover { background: rgba(14,165,233,0.1); }
+
+    /* Statement */
+    .statement { padding: 5rem 2rem; max-width: 1000px; margin: 0 auto; }
+    .statement blockquote { font-family: var(--display); font-weight: 600; font-size: clamp(1.5rem, 3.5vw, 2.4rem); line-height: 1.2; color: var(--off-white); border-left: 3px solid var(--blue); padding-left: 2rem; max-width: 680px; }
+    .statement blockquote strong { color: var(--blue); }
+
+    /* Changelog */
+    .changelog { padding: 5rem 2rem; max-width: 1000px; margin: 0 auto; }
+    .cl-item { display: grid; grid-template-columns: 140px 1fr; gap: 2rem; padding: 1.5rem 0; border-bottom: 1px solid rgba(232,237,242,0.06); align-items: start; }
+    .cl-item:first-child { border-top: 1px solid rgba(232,237,242,0.06); }
+    .cl-version { font-family: var(--mono); font-size: 0.78rem; font-weight: 600; color: var(--blue); letter-spacing: 0.05em; }
+    .cl-date { font-family: var(--mono); font-size: 0.65rem; color: var(--grey); margin-top: 0.25rem; }
+    .cl-notes { font-size: 0.88rem; color: var(--grey); line-height: 1.7; }
+    .cl-notes strong { display: block; color: var(--off-white); margin-bottom: 0.3rem; font-size: 0.9rem; }
+
+    /* CTA */
+    .cta { padding: 6rem 2rem; text-align: center; max-width: 1000px; margin: 0 auto; }
+    .cta h2 { font-family: var(--display); font-weight: 700; font-size: clamp(2.5rem, 7vw, 4.5rem); letter-spacing: -0.01em; margin-bottom: 1rem; }
+    .cta p { font-family: var(--mono); font-size: 0.82rem; letter-spacing: 0.06em; color: var(--grey); margin-bottom: 2.5rem; }
+
+    footer { padding: 2.5rem 2rem; border-top: 1px solid rgba(232,237,242,0.06); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; max-width: 1000px; margin: 0 auto; }
+    .footer-left { font-family: var(--mono); font-size: 0.7rem; color: var(--grey); letter-spacing: 0.05em; }
+    .footer-left a { color: var(--grey); text-decoration: none; transition: color 0.2s; }
+    .footer-left a:hover { color: var(--off-white); }
+    .footer-suite { font-family: var(--mono); font-size: 0.68rem; color: var(--grey); letter-spacing: 0.08em; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    .footer-suite a { color: var(--grey); text-decoration: none; transition: color 0.2s; }
+    .footer-suite a:hover { color: var(--blue); }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    @media (max-width: 600px) {
+      nav { padding: 1rem; } .nav-links { gap: 1.2rem; }
+      .cl-item { grid-template-columns: 1fr; gap: 0.4rem; }
+      footer { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a class="nav-logo" href="#">OAP</a>
+    <ul class="nav-links">
+      <li><a href="#functions">Functions</a></li>
+      <li><a href="#changelog">Changelog</a></li>
+      <li><a href="https://github.com/donvoorhies/oap" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-version">v <span>2.0.2</span> &nbsp;·&nbsp; Since 2021</div>
+    <p class="hero-eyebrow">WordPress Optimization Plugin</p>
+    <h1 class="hero-title">
+      Don's<br>
+      <span class="accent">Optimization</span><br>
+      Anthology
+    </h1>
+    <div class="hero-since">
+      <div class="since-item">
+        <span class="since-num">2021</span>
+        <span class="since-label">First release</span>
+      </div>
+      <span class="since-divider"></span>
+      <div class="since-item">
+        <span class="since-num">15+</span>
+        <span class="since-label">Functions</span>
+      </div>
+      <span class="since-divider"></span>
+      <div class="since-item">
+        <span class="since-num">0</span>
+        <span class="since-label">External deps</span>
+      </div>
+    </div>
+    <p class="hero-sub">
+      A curated collection of WordPress optimizations — accumulated, refined, and battle-tested since 2021.<br>
+      <em>Designed to complement, not conflict.</em>
+    </p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="https://github.com/donvoorhies/oap/archive/main.zip" target="_blank" rel="noopener">↓ Download latest</a>
+      <a class="btn btn-ghost" href="https://github.com/donvoorhies/oap" target="_blank" rel="noopener">View on GitHub</a>
+    </div>
+    <div class="hero-bg-text" aria-hidden="true">OAP</div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="functions reveal" id="functions">
+    <p class="section-label">What it does</p>
+    <div class="fn-grid">
+      <div class="fn-item"><span class="fn-dot"></span><div class="fn-text">Disables embeds<small>Removes oEmbed bloat</small></div></div>
+      <div class="fn-item"><span class="fn-dot"></span><div class="fn-text">Strips query strings<small>From static resources</small></div></div>
+      <div class="fn-item"><span class="fn-dot"></span><div class="fn-text">Removes WordPress version<small>From head, feeds &amp; params</small></div></div>
+      <div class="fn-item"><span class="fn-dot"></span><div class="fn-text">Prevents XML-RPC SSL test<small>Stops unnecessary requests</small></div></div>
+      <div class="fn-item"><span class="fn-dot"></span><div class="fn-text">Removes header bloat<small>RSD, wlwmanifest, shortlink, REST, feeds</small></div></div>
+      <div class="fn-item"><span class="fn-dot"></span><div class="fn-text">Disables pingbacks &amp; trackbacks<small>Including self-pingbacks</small></div></div>
+      <div class="fn-item"><span class="fn-dot"></span><div class="fn-text">Removes Recent Comments CSS<small>Extra widget styles gone</small></div></div>
+      <div class="fn-item"><span class="fn-dot"></span><div class="fn-text">Minifies CSS &amp; JS<small>Production-grade</small></div></div>
+      <div class="fn-item"><span class="fn-dot"></span><div class="fn-text">Combines CSS &amp; JS<small>Fewer HTTP requests</small></div></div>
+      <div class="fn-item"><span class="fn-dot"></span><div class="fn-text">Heartbeat API control<small>Normal / throttle / disable</small></div></div>
+      <div class="fn-item"><span class="fn-dot"></span><div class="fn-text">HTML minification<small>Experimental</small></div></div>
+      <div class="fn-item"><span class="fn-dot"></span><div class="fn-text">Settings page<small>Toggle each function independently</small></div></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <div class="compat reveal">
+    <div class="compat-inner">
+      <p class="compat-label">Suite compatibility</p>
+      <p>As of v2.0.1, OAP is intentionally <strong>scoped down</strong> to avoid conflicts with the rest of the suite. Overlapping frontend optimizations have been moved to Critical Path CSS. OAP handles what the others don't.</p>
+      <div class="compat-plugins">
+        <a class="compat-tag" href="https://donvoorhies.github.io/cccp/">CCCP — Privacy</a>
+        <a class="compat-tag" href="https://github.com/donvoorhies/critical-path-css-v2">Critical Path CSS — Performance</a>
+        <a class="compat-tag" href="https://donvoorhies.github.io/flak-jacket/">Flak Jacket — Security</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider" style="margin-top:3rem;"></div>
+
+  <section class="statement reveal">
+    <blockquote>
+      "An anthology isn't a plugin that does everything.<br>
+      <strong>It's a plugin that does the right things.</strong>"
+    </blockquote>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="changelog reveal" id="changelog">
+    <p class="section-label">Changelog</p>
+    <div class="cl-item">
+      <div><p class="cl-version">v2.0.2</p><p class="cl-date">March 6, 2026</p></div>
+      <div class="cl-notes"><strong>Push notification &amp; compatibility fixes</strong>Fixed push-notification contrast issue. Improved compatibility for push/captcha scripts. Adjusted query-string cleanup to remove only version-like params.</div>
+    </div>
+    <div class="cl-item">
+      <div><p class="cl-version">v2.0.1</p><p class="cl-date">March 6, 2026</p></div>
+      <div class="cl-notes"><strong>Suite compatibility refactor</strong>Removed overlapping optimization features so OAP runs cleanly alongside critical-path-css-v2. Many functions migrated there.</div>
+    </div>
+    <div class="cl-item">
+      <div><p class="cl-version">v2.0.0</p><p class="cl-date">May 14, 2025</p></div>
+      <div class="cl-notes"><strong>Major rebuild</strong>Critical CSS UI reinstated. Production-grade minify/combine. Heartbeat API control. HTML minification. Settings page.</div>
+    </div>
+    <div class="cl-item">
+      <div><p class="cl-version">v1.0.8</p><p class="cl-date">May 5, 2023</p></div>
+      <div class="cl-notes">Removed Above The Fold CSS. Updated CDN URLs and SRI hashes for jQuery libraries.</div>
+    </div>
+    <div class="cl-item">
+      <div><p class="cl-version">v1.0.0</p><p class="cl-date">March 30, 2021</p></div>
+      <div class="cl-notes"><strong>First stable release</strong>The anthology begins.</div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="cta reveal">
+    <h2>Add it to the stack</h2>
+    <p>Free. Open source. CC BY-NC-SA 4.0. Since 2021.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+      <a class="btn btn-primary" href="https://github.com/donvoorhies/oap/archive/main.zip" target="_blank" rel="noopener">↓ Download latest</a>
+      <a class="btn btn-ghost" href="https://github.com/donvoorhies/oap" target="_blank" rel="noopener">View source on GitHub</a>
+    </div>
+  </section>
+
+  <footer>
+    <p class="footer-left">OAP &nbsp;·&nbsp; <a href="https://github.com/donvoorhies/oap">github.com/donvoorhies/oap</a> &nbsp;·&nbsp; by <a href="https://don.voorhies.dk">Don W. Voorhies</a></p>
+    <nav class="footer-suite">
+      <a href="https://donvoorhies.github.io/cccp/">CCCP</a>
+      <a href="https://github.com/donvoorhies/critical-path-css-v2">Critical Path CSS</a>
+      <a href="https://donvoorhies.github.io/flak-jacket/">Flak Jacket</a>
+    </nav>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver(
+      entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
+      { threshold: 0.1 }
+    );
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
+>>>>>>> 70d32c7 (Restore index.html)
