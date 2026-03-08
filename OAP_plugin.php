@@ -42,9 +42,11 @@ if (!defined('WPSO_PLUGIN_VERSION')) {
  * @since 2.0.0
  * @return array The array of plugin options, or an empty array if not set.
  */
+// Retrieve plugin options with static cache for performance
 function wpso_get_options() {
     static $wpso_options = null;
     if (null === $wpso_options) {
+        // Load options from the database only once per request
         $wpso_options = get_option('wpso_options', []);
     }
     return $wpso_options;
@@ -58,8 +60,10 @@ function wpso_get_options() {
  * @since 2.0.3
  * @return bool
  */
+// Check if debug logging is enabled (via wp-config.php)
 function wpso_debug_enabled() {
     $enabled = defined('WPSO_DEBUG') && WPSO_DEBUG;
+    // Allow filter override for debug mode
     return (bool) apply_filters('wpso_debug_enabled', $enabled);
 }
 
@@ -70,6 +74,7 @@ function wpso_debug_enabled() {
  * @param string $message Debug message.
  * @return void
  */
+// Write a debug log entry if debug mode is enabled
 function wpso_debug_log($message) {
     if (!wpso_debug_enabled()) {
         return;
@@ -83,6 +88,7 @@ function wpso_debug_log($message) {
  * @since 2.0.3
  * @return void
  */
+// Log fatal errors at shutdown for easier debugging
 function wpso_debug_shutdown_logger() {
     if (!wpso_debug_enabled()) {
         return;
@@ -91,6 +97,7 @@ function wpso_debug_shutdown_logger() {
     if (!$error || !isset($error['type'])) {
         return;
     }
+    // List of fatal error types to catch
     $fatal_types = [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR, E_RECOVERABLE_ERROR];
     if (in_array($error['type'], $fatal_types, true)) {
         $line = isset($error['line']) ? (int) $error['line'] : 0;
@@ -99,6 +106,7 @@ function wpso_debug_shutdown_logger() {
         error_log('[WPSO DEBUG][FATAL] ' . $msg . ' in ' . $file . ':' . $line);
     }
 }
+// Register debug logger and log plugin load if debug is enabled
 add_action('plugins_loaded', function() {
     if (wpso_debug_enabled()) {
         wpso_debug_log('plugins_loaded');
@@ -113,6 +121,7 @@ add_action('plugins_loaded', function() {
  *
  * @since 1.0.0
  */
+// Add plugin settings page to the WordPress admin menu
 function wpso_admin_menu_setup() {
     add_options_page(
         __('WP Speed Optimizer Settings', 'wpso'),
@@ -129,6 +138,7 @@ add_action('admin_menu', 'wpso_admin_menu_setup');
  *
  * @since 1.0.0
  */
+// Register plugin settings and fields in the admin area
 function wpso_admin_init_setup() {
     register_setting('wpso_settings', 'wpso_options', [
         'sanitize_callback' => 'wpso_sanitize_options',
@@ -136,7 +146,7 @@ function wpso_admin_init_setup() {
 
     add_settings_section('wpso_main', __('Speedy Settings', 'wpso'), null, 'wpso-settings');
 
-    // Field definitions with descriptions for clarity, especially experimental ones.
+    // Define settings fields with descriptions (including experimental flags)
     $fields = [
         ['id' => 'minify', 'title' => __('Minify CSS & JS', 'wpso'), 'callback' => 'wpso_field_minify', 'description' => __('Basic minification for CSS & JS. (Prototype)', 'wpso')],
         ['id' => 'combine', 'title' => __('Combine CSS & JS', 'wpso'), 'callback' => 'wpso_field_combine', 'description' => __('Combines multiple CSS/JS files. Requires file caching to be effective. (Prototype)', 'wpso')],
@@ -145,6 +155,7 @@ function wpso_admin_init_setup() {
         ['id' => 'minify_html', 'title' => __('Minify HTML Output', 'wpso'), 'callback' => 'wpso_field_minify_html', 'description' => __('<strong>Warning (Experimental):</strong> Aggressively removes whitespace from HTML. Can break complex HTML or inline scripts. Test carefully.', 'wpso'), 'is_experimental' => true],
     ];
 
+    // Register each field with WordPress
     foreach ($fields as $field) {
         add_settings_field($field['id'], $field['title'], $field['callback'], 'wpso-settings', 'wpso_main', ['description' => $field['description'] ?? '', 'is_experimental' => $field['is_experimental'] ?? false]);
     }
@@ -158,16 +169,22 @@ add_action('admin_init', 'wpso_admin_init_setup');
  * @param array $input The input options array from the settings page.
  * @return array The sanitized options array.
  */
+// Sanitize plugin options before saving to the database
 function wpso_sanitize_options($input) {
     $sanitized_input = [];
     $checkboxes = ['minify', 'combine', 'minify_html'];
+    // Only allow 1 or 0 for checkboxes
     foreach ($checkboxes as $cb) {
         $sanitized_input[$cb] = isset($input[$cb]) && $input[$cb] == 1 ? 1 : 0;
     }
 
-    if (isset($input['heartbeat'])) { $sanitized_input['heartbeat'] = in_array($input['heartbeat'], ['normal', 'throttle', 'disable'], true) ? $input['heartbeat'] : 'normal'; }
+    // Validate heartbeat option
+    if (isset($input['heartbeat'])) {
+        $sanitized_input['heartbeat'] = in_array($input['heartbeat'], ['normal', 'throttle', 'disable'], true) ? $input['heartbeat'] : 'normal';
+    }
 
-    // wpso_reset_options_cache(); // Consider if explicit reset of static options cache is needed here.
+    // Optionally reset static cache if needed
+    // wpso_reset_options_cache();
     return $sanitized_input;
 }
 
@@ -176,10 +193,26 @@ function wpso_sanitize_options($input) {
  * @since 1.0.0
  * @return array List of Google Fonts found, with handle, type, and src.
  */
+// Detect Google Fonts enqueued on the site (styles and scripts)
 function wpso_detect_google_fonts() {
-    global $wp_styles, $wp_scripts; $fonts = [];
-    if (isset($wp_styles->registered)) { foreach ($wp_styles->registered as $h => $s) { if (isset($s->src) && strpos($s->src, 'fonts.googleapis.com')!==false) $fonts[]=['handle'=>$h,'type'=>'style','src'=>$s->src];}}
-    if (isset($wp_scripts->registered)) { foreach ($wp_scripts->registered as $h => $s) { if (isset($s->src) && strpos($s->src, 'fonts.googleapis.com')!==false) $fonts[]=['handle'=>$h,'type'=>'script','src'=>$s->src];}}
+    global $wp_styles, $wp_scripts;
+    $fonts = [];
+    // Check registered styles for Google Fonts
+    if (isset($wp_styles->registered)) {
+        foreach ($wp_styles->registered as $h => $s) {
+            if (isset($s->src) && strpos($s->src, 'fonts.googleapis.com') !== false) {
+                $fonts[] = ['handle' => $h, 'type' => 'style', 'src' => $s->src];
+            }
+        }
+    }
+    // Check registered scripts for Google Fonts
+    if (isset($wp_scripts->registered)) {
+        foreach ($wp_scripts->registered as $h => $s) {
+            if (isset($s->src) && strpos($s->src, 'fonts.googleapis.com') !== false) {
+                $fonts[] = ['handle' => $h, 'type' => 'script', 'src' => $s->src];
+            }
+        }
+    }
     return $fonts;
 }
 
