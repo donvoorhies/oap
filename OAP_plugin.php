@@ -5,7 +5,7 @@
  * Description: WordPress optimization anthology plugin focused on non-overlapping optimizations; designed to run alongside critical-path-css-v2.
  * Version:     2.0.1
  * Author:      Don Voorhies
- * License:     CC BY-NC-SA 4.0
+ * License:     GPL 3.0
  * Text Domain: wpso
  *
  * OAP (Optimization Anthology Plugin)
